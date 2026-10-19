@@ -139,7 +139,10 @@
       $('#ia-estado').textContent = iaLista ? `conectado · ${j.archivos} archivos de código` : 'sin clave de IA';
     } catch {
       iaLista = false;
-      $('#ia-estado').textContent = 'apagado: abre con ABRIR PRESENTACION.bat';
+      // Desde la nube el navegador no deja hablar con el portátil: se ofrece saltar a la versión local.
+      $('#ia-estado').innerHTML = BASE
+        ? 'solo en el portátil: <a href="http://127.0.0.1:5190/">abrir versión con asistente</a>'
+        : 'apagado: abre con ABRIR PRESENTACION.bat';
     }
     $('#ia-punto').classList.toggle('on', iaLista);
   }
@@ -186,7 +189,10 @@
     } catch (e) {
       r.classList.remove('cargando');
       r.classList.add('error');
-      r.textContent = iaLista ? `No respondió (${e.message}). Intenta de nuevo.` : 'El asistente está apagado. Abre la presentación con ABRIR PRESENTACION.bat.';
+      if (iaLista) r.textContent = `No respondió (${e.message}). Intenta de nuevo.`;
+      else r.innerHTML = BASE
+        ? 'El asistente solo funciona en la versión local. Abre el acceso directo "Presentacion ClassHub" del escritorio o <a href="http://127.0.0.1:5190/">esta versión</a> si ya está encendido.'
+        : 'El asistente está apagado. Abre el acceso directo "Presentacion ClassHub" del escritorio.';
     }
     chat.scrollTop = chat.scrollHeight;
   }

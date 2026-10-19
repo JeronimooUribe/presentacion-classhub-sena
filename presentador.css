@@ -157,3 +157,4 @@ details p { margin: 8px 0 0; color: #D7E0FA; }
   .cajon { top: 0; bottom: 0; }
 }
 @media (max-width: 900px) { html, body { overflow-x: hidden; } }
+.ia-cab small a, .ia-par .r a { color: #C29BFF; font-weight: 700; }
