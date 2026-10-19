@@ -216,7 +216,7 @@ function respuestaSinInternet(pregunta) {
       ? `No tengo una respuesta guardada; en el código aparece "${clave}" aquí: ` + hallazgos.map(l => `[[${l.split(': ')[0]}]]`).join(' ')
       : 'No tengo una respuesta guardada para eso. Busca en el panel "Preguntas SENA" o en el mapa del código.';
   }
-  return { texto: 'Sin internet · respuesta guardada: ' + texto, modelo: 'respaldo local', respaldo: true };
+  return { texto: texto, modelo: 'respaldo local', respaldo: true };
 }
 
 // ---------- Acceso ----------

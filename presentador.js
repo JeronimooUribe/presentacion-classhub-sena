@@ -84,7 +84,7 @@
   $('#adelante').onclick = () => M.siguiente();
   M.teclado(k => {
     if (k === '/') { abrirIA(); }
-    else if (k === 'Escape') { $('#ia').hidden = true; $('#sena').hidden = true; $('#plan').hidden = true; }
+    else if (k === 'Escape') { $('#ia').hidden = true; $('#sena').hidden = true; }
   });
 
   // Abre la pantalla del público; si el navegador lo permite, directo en la otra pantalla.
@@ -127,15 +127,6 @@
   }
   $('#btn-sena').onclick = () => { if ($('#sena').hidden) abrirSena(); else $('#sena').hidden = true; };
 
-  // ---------- Plan B sin internet ----------
-  const abrirPlan = () => { $('#plan').hidden = false; $('#sena').hidden = true; $('#ia').hidden = true; };
-  $('#btn-plan').onclick = () => { if ($('#plan').hidden) abrirPlan(); else $('#plan').hidden = true; };
-  $('#plan [data-cerrar-plan]').onclick = () => { $('#plan').hidden = true; };
-  $('#ver-plan').onclick = abrirPlan;
-  const red = () => { $('#sin-red').hidden = navigator.onLine; $('#btn-plan').classList.toggle('alerta', !navigator.onLine); };
-  addEventListener('online', red);
-  addEventListener('offline', red);
-  red();
   $('#sena [data-cerrar]').onclick = () => { $('#sena').hidden = true; };
 
   // ---------- Abrir código en Antigravity ----------
@@ -180,10 +171,11 @@
   estadoIA();
   setInterval(estadoIA, 30000);
 
-  function abrirIA() { $('#ia').hidden = false; $('#sena').hidden = true; $('#ia-q').focus(); }
-  $('#ia-btn').onclick = () => { if ($('#ia').hidden) abrirIA(); else $('#ia').hidden = true; };
-  $('#ia [data-cerrar-ia]').onclick = () => { $('#ia').hidden = true; };
-  $('#ia').addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Escape') $('#ia').hidden = true; });
+  function abrirIA() { $('#ia').hidden = false; $('#sena').hidden = true; document.body.classList.add('ia-abierta'); $('#ia-q').focus(); }
+  const cerrarIA = () => { $('#ia').hidden = true; document.body.classList.remove('ia-abierta'); };
+  $('#ia-btn').onclick = () => { if ($('#ia').hidden) abrirIA(); else cerrarIA(); };
+  $('#ia [data-cerrar-ia]').onclick = cerrarIA;
+  $('#ia').addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Escape') cerrarIA(); });
   $('.ia-sugerencias').addEventListener('click', e => { const b = e.target.closest('button'); if (b) enviar(b.textContent); });
 
   // Convierte la respuesta: [[ruta:línea]] → enlace a Antigravity, **negrita**, `código`.
@@ -217,16 +209,16 @@
       if (!res.ok) throw new Error(j.error || 'Error');
       r.classList.remove('cargando');
       if (j.respaldo) r.classList.add('respaldo');
-      r.innerHTML = formatear(j.texto) + `<small class="seg">${((Date.now() - t0) / 1000).toFixed(1)} s${j.respaldo ? ' · sin internet' : ''}</small>`;
+      r.innerHTML = formatear(j.texto) + `<small class="seg">${((Date.now() - t0) / 1000).toFixed(1)} s</small>`;
       historial.push({ p: pregunta, r: j.texto });
     } catch (e) {
       r.classList.remove('cargando');
       r.classList.add('error');
       r.textContent = iaLista ? `No respondió (${e.message}). Intenta de nuevo.`
-        : BASE ? 'No hay conexión con el asistente. Revisa el internet; sin internet, usa el acceso directo del escritorio (responde con respuestas guardadas).'
+        : BASE ? 'No hay conexión con el asistente. Revisa el internet e intenta de nuevo.'
         : 'El asistente está apagado. Abre el acceso directo "Presentacion ClassHub" del escritorio.';
     }
-    chat.scrollTop = chat.scrollHeight;
+    burbuja.scrollIntoView({ block: 'start' });
   }
   // Pide el PIN del equipo una sola vez (queda guardado en este navegador) y repite la pregunta.
   function pedirPin(r, pregunta) {

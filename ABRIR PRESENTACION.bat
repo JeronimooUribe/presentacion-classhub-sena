@@ -12,10 +12,7 @@ start "Servidor de la presentacion (no cerrar)" /min "%NODO%" servidor\servidor.
 rem 2. El codigo de ClassHub abierto en Antigravity IDE
 if exist "%AG%" start "" "%AG%" "%REPO%"
 
-rem 3. Plan B en segundo plano: Docker + ClassHub offline listos por si se cae internet
-start "" /min powershell -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "servidor\plan-b.ps1" "%REPO%"
-
-rem 4. La vista del presentador
+rem 3. La vista del presentador
 timeout /t 3 /nobreak >nul
 set "CHROME=%ProgramFiles%\Google\Chrome\Application\chrome.exe"
 if exist "%CHROME%" (start "" "%CHROME%" --new-window "http://127.0.0.1:5190/") else (start "" "http://127.0.0.1:5190/")

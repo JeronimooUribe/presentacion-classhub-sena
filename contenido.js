@@ -494,7 +494,7 @@ window.EXPO = {
       guion: [
         '"Docker empaqueta la app con todo lo que necesita (Node 20, las librerías y el código) en un contenedor."',
         '[→] "El Dockerfile tiene 3 etapas: instalar dependencias, compilar y ejecutar. La última solo lleva lo necesario, con un usuario sin privilegios."',
-        '[→] "Así funciona igual en cualquier computador y en Railway. Además, nuestro plan B: el modo offline levanta ClassHub y MySQL en este portátil con Docker Compose."',
+        '[→] "Así funciona igual en cualquier computador y en Railway."',
         'Si preguntan por código adaptado: "Este Dockerfile lo adaptamos del ejemplo oficial de Next.js."',
       ],
       repaso: {
@@ -508,7 +508,6 @@ window.EXPO = {
         ['Etapa 3: ejecutar', 'Dockerfile', 29],
         ['Variables de compilación (adaptación)', 'Dockerfile', 17],
         ['output: standalone', 'next.config.ts', 49],
-        ['Modo offline (Compose)', 'docker-compose.yml', 13],
       ],
       preguntas: [
         { p: '¿Qué diferencia hay entre imagen y contenedor?', r: 'La imagen es el paquete, la plantilla; el contenedor es esa imagen en ejecución. De una imagen salen muchos contenedores.' },
@@ -560,13 +559,12 @@ window.EXPO = {
           <div class="chips centro">
             <span class="chip grande" data-p="1"><i class="ph-bold ph-bug"></i>Bug real → prueba → arreglado</span>
             <span class="chip grande" data-p="2"><i class="ph-bold ph-moon-stars"></i>Respaldo cada noche</span>
-            <span class="chip grande" data-p="2"><i class="ph-bold ph-plug"></i>Plan B sin internet</span>
           </div>
         </div>`,
       guion: [
         '"Tenemos 140 pruebas automáticas con Vitest: sesión, permisos, validaciones, límites. En cada cambio, GitHub Actions corre revisión de estilo, tipos, las pruebas, la compilación y una auditoría de seguridad."',
         '[→] "Esto nos salvó: desde junio, los estudiantes y monitores no veían sus tareas. Una prueba reprodujo el error (el middleware respondía 403), lo arreglamos y la prueba pasó."',
-        '[→] "Además, cada noche se saca un respaldo de la base con mysqldump, y si falla el internet tenemos el modo offline."',
+        '[→] "Además, cada noche se saca un respaldo de la base con mysqldump."',
         'PASE: "Jerónimo, ¿cerramos?"',
       ],
       repaso: {

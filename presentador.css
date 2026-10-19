@@ -169,3 +169,14 @@ a.btn { text-decoration: none; }
 .pin-form { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .pin-form input { width: 110px; font: inherit; font-size: 16px; letter-spacing: 0.2em; color: var(--texto); background: var(--fondo); border: 1px solid #B07CFF; border-radius: 8px; padding: 6px 10px; }
 .pin-form button { border: 0; border-radius: 8px; padding: 7px 12px; background: #B07CFF; color: #10072A; font-weight: 800; }
+
+/* Asistente como panel lateral de alto completo: se ajusta a cualquier zoom y nunca se sale de la pantalla. */
+.ia { top: 10px; bottom: 10px; right: 10px; height: auto; max-height: none; width: min(460px, calc(100vw - 20px)); }
+.ia-chat { min-height: 0; }
+.ia-par { scroll-margin-top: 8px; }
+.ia-cab { flex-wrap: wrap; row-gap: 2px; }
+.ia-cab small { order: 3; width: 100%; margin-left: 30px; }
+.ia-cab .mini-btn { margin-left: auto; }
+body.ia-abierta .ia-btn { display: none; }
+.ia-par .r { word-break: break-word; }
+.cod-mini { max-width: 100%; white-space: normal; word-break: break-all; }
