@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ClassHub · Presentador</title>
+  <meta name="theme-color" content="#0A1024">
+  <link rel="icon" href="img/logo.png">
+  <link rel="stylesheet" href="vendor/ph/bold.css">
+  <link rel="stylesheet" href="vendor/ph/fill.css">
+  <link rel="stylesheet" href="presentador.css">
+</head>
+<body>
+  <header class="barra">
+    <img src="img/logo.png" alt="" class="marca">
+    <div class="donde"><b id="numero">1 / 17</b><span id="titulo">Portada</span></div>
+    <span id="quien" class="quien"></span>
+    <div class="reloj" title="Tiempo total de la exposición (15 min)">
+      <i class="ph-bold ph-timer"></i><b id="total">00:00</b><small>/ 15:00</small>
+      <button id="reloj-btn" class="mini-btn" title="Iniciar o pausar"><i class="ph-fill ph-play"></i></button>
+      <button id="reloj-cero" class="mini-btn" title="Reiniciar"><i class="ph-bold ph-arrow-counter-clockwise"></i></button>
+    </div>
+    <div class="acciones">
+      <button id="btn-sena" class="btn"><i class="ph-bold ph-exam"></i>Preguntas SENA</button>
+      <button id="btn-proyectar" class="btn primario"><i class="ph-bold ph-projector-screen"></i>Proyectar</button>
+    </div>
+  </header>
+
+  <main class="cuerpo">
+    <section class="izq">
+      <div class="marco actual"><iframe id="vista" src="publico.html?mini=1" title="Lo que ve el público" tabindex="-1"></iframe></div>
+      <div class="controles">
+        <button id="atras" class="nav" aria-label="Anterior"><i class="ph-bold ph-caret-left"></i></button>
+        <div class="pasos-info"><div id="puntos" class="puntos"></div><small id="tiempo-diapo">0:00 · sugerido 0:45</small></div>
+        <button id="adelante" class="nav" aria-label="Siguiente"><i class="ph-bold ph-caret-right"></i></button>
+      </div>
+      <div class="siguiente-box"><small>Siguiente</small><div class="marco sig"><iframe id="sig" title="Siguiente diapositiva" tabindex="-1"></iframe></div></div>
+    </section>
+
+    <section class="der" id="notas"></section>
+  </main>
+
+  <nav id="tira" class="tira" aria-label="Diapositivas"></nav>
+
+  <!-- Panel de las preguntas oficiales del SENA -->
+  <aside id="sena" class="cajon" hidden>
+    <div class="cajon-cab"><h2><i class="ph-bold ph-exam"></i>Preguntas de la profe</h2><button class="mini-btn" data-cerrar aria-label="Cerrar"><i class="ph-bold ph-x"></i></button></div>
+    <div id="sena-lista" class="cajon-cuerpo"></div>
+  </aside>
+
+  <!-- Asistente de IA (solo en esta pantalla) -->
+  <button id="ia-btn" class="ia-btn" title="Asistente (tecla /)"><i class="ph-fill ph-sparkle"></i><span id="ia-punto" class="punto-estado"></span></button>
+  <aside id="ia" class="ia" hidden>
+    <div class="ia-cab"><b><i class="ph-fill ph-sparkle"></i>Asistente ClassHub</b><small id="ia-estado">conectando…</small><button class="mini-btn" data-cerrar-ia aria-label="Cerrar"><i class="ph-bold ph-x"></i></button></div>
+    <div id="ia-chat" class="ia-chat">
+      <div class="ia-sugerencias">
+        <button>¿Dónde se crea una tarea?</button>
+        <button>Diferencia entre API y HTTPS en ClassHub</button>
+        <button>¿Qué pasa si borro httpOnly en lib/auth.ts?</button>
+      </div>
+    </div>
+    <form id="ia-form" class="ia-form"><input id="ia-q" autocomplete="off" placeholder="Pregunta rápido…"><button aria-label="Preguntar"><i class="ph-fill ph-paper-plane-right"></i></button></form>
+  </aside>
+
+  <script src="contenido.js"></script>
+  <script src="motor.js"></script>
+  <script src="presentador.js"></script>
+</body>
+</html>
