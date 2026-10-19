@@ -6,6 +6,7 @@ import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import vm from 'node:vm';
 
 const AQUI = path.dirname(fileURLToPath(import.meta.url));
 const RAIZ = path.resolve(AQUI, '..');
@@ -87,7 +88,7 @@ function conocimiento() {
 }
 const SISTEMA = `Eres el asistente privado del equipo de ClassHub (Jerónimo Uribe Garcés, Juan Sebastián Carmona, Juan Diego Gaviria y Miguel Ángel Valencia) para su exposición de proyecto de grado en el SENA. Te consultan en vivo, en segundos, desde el portátil del expositor; el público no te ve.
 
-CONCEPTO VIGENTE (manda sobre cualquier texto viejo): ClassHub es un proyecto de los estudiantes y para los estudiantes. En cada salón hay monitores (de tareas, de asistencia…); quien publica las tareas es el MONITOR DE TAREAS o un estudiante elegido por el grupo. En el código ese rol se llama "moderator" (moderador). Los profesores NO son usuarios de la app. Si el tablero de estudio dice "docente", entiéndelo y dilo siempre como "monitor de tareas".
+CONCEPTO VIGENTE (manda sobre cualquier texto viejo): ClassHub es un proyecto de los estudiantes y para los estudiantes. En cada salón hay monitores (de tareas, de asistencia…); quien publica las tareas es el MONITOR DE TAREAS o un estudiante elegido por el grupo. En el código ese rol se llama "moderator" (moderador). Los profesores NO son usuarios de la app. Nunca uses la palabra "docente": di siempre "monitor de tareas" (o "monitor"). "Profesor" solo para los profesores reales que dictan la clase. En la app de producción la cuenta de prueba del monitor puede seguir llamándose docente@classhub.demo; en el modo offline es monitor@classhub.demo.
 
 CÓMO RESPONDER (obligatorio):
 - Español claro. Máximo 3 frases cortas, menos de 60 palabras. Sin títulos, sin listas, sin saludos ni cierres.
@@ -153,6 +154,65 @@ async function preguntar({ pregunta, historial = [], diapo = '' }) {
   return { texto: 'No alcancé a ubicarlo; reformula la pregunta más corta.', modelo };
 }
 
+
+// ---------- Respaldo sin internet ----------
+// Si no hay conexión con Claude, se responde con lo ya verificado (presentación + tablero) y una búsqueda en el código.
+const SIN_INTERNET = process.env.SIN_INTERNET === '1';
+function cargarBase() {
+  const caja = { window: {} };
+  caja.window.window = caja.window;
+  vm.createContext(caja);
+  const correr = f => { try { vm.runInContext(fs.readFileSync(f, 'utf8'), caja); } catch { /* opcional */ } };
+  for (const f of ['data.js', 'contenido.js', 'esencial.js', 'conceptos.js', 'codigo.js', 'lider.js', 'preguntas-dificiles.js']) correr(path.join(TABLERO, f));
+  correr(path.join(RAIZ, 'contenido.js'));
+  const E = caja.window.EXPO || {}, T = caja.window.TABLERO || {};
+  const base = [];
+  const add = (p, r, loc) => { if (p && r) base.push({ p: String(p), r: String(r), loc }); };
+  (E.sena || []).forEach(q => add(q.p, q.r, q.codigo?.[0] ? `${q.codigo[0][1]}:${q.codigo[0][2]}` : ''));
+  (E.borrar || []).forEach(([f, l, que, efecto]) => add(`qué pasa si borro ${que} ${f} línea ${l}`, `Si se borra ${que}: ${efecto}`, `${f}:${l}`));
+  (E.slides || []).forEach(sl => {
+    (sl.preguntas || []).forEach(q => add(q.p, q.r));
+    if (sl.repaso) add(`${sl.titulo} qué es cómo funciona`, `${sl.repaso.que} ${sl.repaso.como}`, sl.codigo?.[0] ? `${sl.codigo[0][1]}:${sl.codigo[0][2]}` : '');
+    (sl.codigo || []).forEach(([t, f, l]) => add(`dónde está ${t}`, `${t}.`, `${f}:${l}`));
+  });
+  (T.esferas || []).forEach(e => (e.preguntas || []).forEach(q => add(q.p, q.r)));
+  (T.codigo?.simulacro || []).forEach(([p, r]) => add(p, r));
+  (T.codigo?.funciones || []).forEach(([n, loc, d]) => add(`${n} ${d}`, `${n}: ${d}.`, String(loc).split(' / ')[0]));
+  (T.conceptos || []).forEach(c => add(`qué es ${c.nombre}`, `${c.nombre}: ${c.que} ${c.enClassHub || ''}`));
+  (T.lider?.stack || []).forEach(x => add(`qué es ${x.n} para qué`, `${x.n}: ${x.que} ${x.uso}`));
+  return base;
+}
+const BASE = cargarBase();
+const sinTildes = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+const VACIAS = new Set('que como donde cual cuales para por con los las del una uno unos unas sus esta este esto son hay pasa porque cuando entre sobre classhub tiene hace hacen puede pueden nuestro nuestra'.split(' '));
+const palabras = t => sinTildes(t).split(/[^a-z0-9_.]+/).filter(w => w.length > 2 && !VACIAS.has(w));
+
+function respuestaSinInternet(pregunta) {
+  const pq = palabras(pregunta);
+  const puntaje = item => {
+    const p = sinTildes(item.p), r = sinTildes(item.r);
+    return pq.reduce((a, w) => a + (p.includes(w) ? 3 : 0) + (r.includes(w) ? 1 : 0), 0);
+  };
+  const orden = BASE.map(x => ({ x, n: puntaje(x) })).sort((a, b) => b.n - a.n);
+  const mejor = orden[0];
+  let texto;
+  if (mejor && mejor.n >= 4) {
+    const r = mejor.x.r.length > 420 ? mejor.x.r.slice(0, 420).replace(/\s\S*$/, '') + '…' : mejor.x.r;
+    const locs = new Set();
+    if (mejor.x.loc) locs.add(mejor.x.loc);
+    (mejor.x.r.match(/[\w()[\]./-]+\.(?:tsx?|js|sql|yml|json|toml)(?::\d+)?/g) || []).forEach(l => locs.add(l));
+    texto = r + (locs.size ? '\n' + [...locs].slice(0, 3).map(l => `[[${l}]]`).join(' ') : '');
+  } else {
+    // Sin respuesta guardada: buscar la palabra más rara de la pregunta en el código.
+    const clave = pq.filter(w => /[a-z]{4,}/.test(w)).sort((a, b) => b.length - a.length)[0];
+    const hallazgos = clave ? buscarCodigo({ patron: clave.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') }).split('\n').filter(l => /:\d+:/.test(l)).slice(0, 3) : [];
+    texto = hallazgos.length
+      ? `No tengo una respuesta guardada; en el código aparece "${clave}" aquí: ` + hallazgos.map(l => `[[${l.split(': ')[0]}]]`).join(' ')
+      : 'No tengo una respuesta guardada para eso. Busca en el panel "Preguntas SENA" o en el mapa del código.';
+  }
+  return { texto: 'Sin internet · respuesta guardada: ' + texto, modelo: 'respaldo local', respaldo: true };
+}
+
 // ---------- HTTP ----------
 const TIPOS = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.json': 'application/json', '.ico': 'image/x-icon', '.webp': 'image/webp' };
 
@@ -173,17 +233,23 @@ const servidor = http.createServer(async (req, res) => {
   if (req.method === 'OPTIONS') { res.writeHead(204); return res.end(); }
   const url = new URL(req.url, `http://127.0.0.1:${PUERTO}`);
 
-  if (url.pathname === '/api/estado') return json(res, 200, { ok: true, ia: Boolean(CLAVE), archivos: archivos.size, modelo: MODELOS[0] });
+  if (url.pathname === '/api/estado') return json(res, 200, { ok: true, ia: Boolean(CLAVE), respaldo: BASE.length, archivos: archivos.size, modelo: MODELOS[0] });
 
   if (url.pathname === '/api/preguntar' && req.method === 'POST') {
-    if (!CLAVE) return json(res, 503, { error: 'No encontré la clave de Anthropic.' });
     let cuerpo = '';
     for await (const trozo of req) { cuerpo += trozo; if (cuerpo.length > 20_000) return json(res, 413, { error: 'Pregunta muy larga' }); }
     try {
       const datos = JSON.parse(cuerpo || '{}');
       if (!String(datos.pregunta || '').trim()) return json(res, 400, { error: 'Escribe una pregunta' });
       const t0 = Date.now();
-      const r = await preguntar(datos);
+      let r;
+      try {
+        if (!CLAVE || SIN_INTERNET) throw new Error('sin conexión a internet (modo respaldo)');
+        r = await preguntar(datos);
+      } catch (e) {
+        if (!/conexi|fetch|network|ENOTFOUND|ECONN|EAI_AGAIN|timeout/i.test(e.message)) throw e;
+        r = respuestaSinInternet(String(datos.pregunta));
+      }
       console.log(`[${new Date().toLocaleTimeString()}] ${((Date.now() - t0) / 1000).toFixed(1)} s · ${r.modelo} · ${String(datos.pregunta).slice(0, 70)}`);
       return json(res, 200, r);
     } catch (e) {
@@ -206,5 +272,5 @@ const servidor = http.createServer(async (req, res) => {
 
 servidor.listen(PUERTO, '127.0.0.1', () => {
   console.log(`Presentación ClassHub: http://127.0.0.1:${PUERTO}`);
-  console.log(`Asistente IA: ${CLAVE ? 'listo' : 'SIN CLAVE'} · ${archivos.size} archivos de código indexados`);
+  console.log(`Asistente IA: ${CLAVE ? 'listo' : 'SIN CLAVE'} · ${archivos.size} archivos de código · ${BASE.length} respuestas guardadas para usar sin internet`);
 });

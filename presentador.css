@@ -158,3 +158,11 @@ details p { margin: 8px 0 0; color: #D7E0FA; }
 }
 @media (max-width: 900px) { html, body { overflow-x: hidden; } }
 .ia-cab small a, .ia-par .r a { color: #C29BFF; font-weight: 700; }
+.pase { color: var(--verde); }
+.sin-red { position: fixed; left: 50%; bottom: 58px; transform: translateX(-50%); z-index: 35; display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 12px; background: #3A2508; border: 1px solid var(--ambar); color: #FFE2A8; font-weight: 700; font-size: 14.5px; box-shadow: 0 10px 30px rgba(0,0,0,.5); }
+.sin-red[hidden] { display: none; }
+.sin-red button { border: 0; border-radius: 8px; padding: 6px 10px; background: var(--ambar); color: #1A1003; font-weight: 800; }
+#btn-plan.alerta { border-color: var(--ambar); color: #FFD27A; }
+.plan .sena-item p b { color: #fff; }
+.ia-par .r.respaldo { border: 1px dashed var(--ambar); }
+a.btn { text-decoration: none; }

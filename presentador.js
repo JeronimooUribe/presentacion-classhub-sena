@@ -21,7 +21,7 @@
     const guion = sl.guion.map(t => {
       const clic = t.startsWith('[→]');
       if (clic) paso++;
-      const txt = esc(clic ? t.slice(3).trim() : t).replace(/^OJO:/, '<b class="ojo">OJO:</b>');
+      const txt = esc(clic ? t.slice(3).trim() : t).replace(/^OJO:/, '<b class="ojo">OJO:</b>').replace(/^PASE:/, '<b class="pase">PASA LA PALABRA:</b>');
       return `<li class="${paso === estado.p ? 'ahora' : paso < estado.p ? 'dicho' : ''}">${clic ? '<span class="clic">clic</span>' : ''}${txt}</li>`;
     }).join('');
 
@@ -83,7 +83,7 @@
   $('#adelante').onclick = () => M.siguiente();
   M.teclado(k => {
     if (k === '/') { abrirIA(); }
-    else if (k === 'Escape') { $('#ia').hidden = true; $('#sena').hidden = true; }
+    else if (k === 'Escape') { $('#ia').hidden = true; $('#sena').hidden = true; $('#plan').hidden = true; }
   });
 
   // Abre la pantalla del público; si el navegador lo permite, directo en la otra pantalla.
@@ -125,6 +125,16 @@
     if (id) { const el = document.getElementById(`sena-${id}`); el?.scrollIntoView({ block: 'start' }); el?.classList.add('brilla'); setTimeout(() => el?.classList.remove('brilla'), 1600); }
   }
   $('#btn-sena').onclick = () => { if ($('#sena').hidden) abrirSena(); else $('#sena').hidden = true; };
+
+  // ---------- Plan B sin internet ----------
+  const abrirPlan = () => { $('#plan').hidden = false; $('#sena').hidden = true; $('#ia').hidden = true; };
+  $('#btn-plan').onclick = () => { if ($('#plan').hidden) abrirPlan(); else $('#plan').hidden = true; };
+  $('#plan [data-cerrar-plan]').onclick = () => { $('#plan').hidden = true; };
+  $('#ver-plan').onclick = abrirPlan;
+  const red = () => { $('#sin-red').hidden = navigator.onLine; $('#btn-plan').classList.toggle('alerta', !navigator.onLine); };
+  addEventListener('online', red);
+  addEventListener('offline', red);
+  red();
   $('#sena [data-cerrar]').onclick = () => { $('#sena').hidden = true; };
 
   // ---------- Asistente de IA ----------
@@ -184,7 +194,8 @@
       const j = await res.json();
       if (!res.ok) throw new Error(j.error || 'Error');
       r.classList.remove('cargando');
-      r.innerHTML = formatear(j.texto) + `<small class="seg">${((Date.now() - t0) / 1000).toFixed(1)} s</small>`;
+      if (j.respaldo) r.classList.add('respaldo');
+      r.innerHTML = formatear(j.texto) + `<small class="seg">${((Date.now() - t0) / 1000).toFixed(1)} s${j.respaldo ? ' · sin internet' : ''}</small>`;
       historial.push({ p: pregunta, r: j.texto });
     } catch (e) {
       r.classList.remove('cargando');

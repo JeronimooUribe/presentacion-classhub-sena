@@ -21,6 +21,8 @@
       <button id="reloj-cero" class="mini-btn" title="Reiniciar"><i class="ph-bold ph-arrow-counter-clockwise"></i></button>
     </div>
     <div class="acciones">
+      <a class="btn" href="guion.html" target="_blank" rel="noopener"><i class="ph-bold ph-users-three"></i>Guion por persona</a>
+      <button id="btn-plan" class="btn"><i class="ph-bold ph-wifi-slash"></i>Sin internet</button>
       <button id="btn-sena" class="btn"><i class="ph-bold ph-exam"></i>Preguntas SENA</button>
       <button id="btn-proyectar" class="btn primario"><i class="ph-bold ph-projector-screen"></i>Proyectar</button>
     </div>
@@ -46,6 +48,26 @@
   <aside id="sena" class="cajon" hidden>
     <div class="cajon-cab"><h2><i class="ph-bold ph-exam"></i>Preguntas de la profe</h2><button class="mini-btn" data-cerrar aria-label="Cerrar"><i class="ph-bold ph-x"></i></button></div>
     <div id="sena-lista" class="cajon-cuerpo"></div>
+  </aside>
+
+  <!-- Plan B: qué hacer si no hay internet -->
+  <div id="sin-red" class="sin-red" hidden><i class="ph-bold ph-wifi-slash"></i>Sin internet. Todo sigue funcionando desde el portátil. <button id="ver-plan">Ver plan B</button></div>
+  <aside id="plan" class="cajon" hidden>
+    <div class="cajon-cab"><h2><i class="ph-bold ph-wifi-slash"></i>Plan B: sin internet</h2><button class="mini-btn" data-cerrar-plan aria-label="Cerrar"><i class="ph-bold ph-x"></i></button></div>
+    <div class="cajon-cuerpo plan">
+      <section class="sena-item"><header><span class="n">1</span><h3>La presentación sigue igual</h3></header>
+        <p>Si la abriste con el acceso directo <b>"Presentacion ClassHub"</b> del escritorio, todo vive en el portátil: diapositivas, animaciones, guion, preguntas y enlaces a VS Code. No necesita internet. <b>El link de la nube sí lo necesita:</b> por eso siempre usen el acceso directo.</p></section>
+      <section class="sena-item"><header><span class="n">2</span><h3>La demo de ClassHub, en el portátil</h3></header>
+        <p>Abre <b>Docker Desktop</b> y espera a que diga que está corriendo. Luego ve a <code>Proyecto_tareas\ClassHub - Codigo</code> y haz doble clic en <b>ARRANCAR OFFLINE.bat</b>. Se abre <code>localhost:3000</code>; ve a <code>/login</code>.</p>
+        <p>Cuentas (código <code>demo2026</code>): <code>estudiante@classhub.demo</code>, <code>monitor@classhub.demo</code> y <code>admin@classhub.demo</code>. Es la misma app, con la estructura real de la base y datos de prueba.</p>
+        <p><b>Consejo:</b> arráncalo ANTES de empezar a exponer, haya o no internet. Si todo va bien, no se usa; si se cae, ya está listo.</p></section>
+      <section class="sena-item"><header><span class="n">3</span><h3>El QR del final</h3></header>
+        <p>Con los datos de su celular la profe lo puede abrir igual. Si tampoco tiene señal, di: <i>"Se los mostramos aquí en el portátil, es la misma aplicación"</i>, y muéstralo en <code>localhost:3000</code>.</p></section>
+      <section class="sena-item"><header><span class="n">4</span><h3>El asistente</h3></header>
+        <p>Sin internet no puede hablar con Claude, así que responde solo con las <b>respuestas ya verificadas</b> (preguntas de la profe, tabla de líneas, mapa del código) y busca en el código del portátil. Dice "Sin internet · respuesta guardada" y no inventa nada.</p></section>
+      <section class="sena-item"><header><span class="n">5</span><h3>Qué decir si preguntan</h3></header>
+        <p><i>"Justamente para esto preparamos el modo offline: con Docker levantamos la app y su base MySQL en este computador, sin depender de internet."</i> Es un punto a favor: lo explica Miguel Ángel en la diapositiva 13.</p></section>
+    </div>
   </aside>
 
   <!-- Asistente de IA (solo en esta pantalla) -->

@@ -36,7 +36,7 @@ window.EXPO = {
       preguntas: [],
     },
     {
-      titulo: 'El problema', quien: 0, seg: 45, pasos: 2, sena: [1],
+      titulo: 'El problema', quien: 0, seg: 40, pasos: 2, sena: [1],
       publico: () => `
         <div class="s gancho">
           <h1 class="t1 centro pregunta a" data-hasta="1">¿Qué tarea había<br>para mañana?</h1>
@@ -102,7 +102,7 @@ window.EXPO = {
 
     // ───────────────────────────── 1 · JERÓNIMO ─────────────────────────────
     {
-      titulo: 'Cómo se conecta todo', quien: 0, seg: 70, pasos: 3, sena: [3, 4],
+      titulo: 'Cómo se conecta todo', quien: 0, seg: 60, pasos: 3, sena: [3, 4],
       publico: () => `
         <div class="s arqui">
           <h1 class="t1 a">Cómo se conecta todo</h1>
@@ -148,7 +148,7 @@ window.EXPO = {
       ],
     },
     {
-      titulo: 'API y HTTPS', quien: 0, seg: 70, pasos: 3, sena: [3, 4, 6],
+      titulo: 'API y HTTPS', quien: 0, seg: 60, pasos: 3, sena: [3, 4, 6],
       publico: () => `
         <div class="s api">
           <h1 class="t1 a">API: el menú del servidor</h1>
@@ -193,7 +193,7 @@ window.EXPO = {
       ],
     },
     {
-      titulo: 'Seguridad', quien: 0, seg: 75, pasos: 3, sena: [6, 11],
+      titulo: 'Seguridad', quien: 0, seg: 65, pasos: 3, sena: [6, 11],
       publico: () => `
         <div class="s segu">
           <h1 class="t1 a">El portero y la pulsera</h1>
@@ -216,6 +216,7 @@ window.EXPO = {
         '[→] "Antes de CADA página o API, el portero, el middleware, revisa la pulsera. Estudiante a su tablero: pasa."',
         '[→] "Estudiante pidiendo /api/admin: 403, prohibido (y si abre la página /admin, lo devuelve a su tablero). Segunda capa: cada API vuelve a revisar el rol con requireRole."',
         '[→] "Además: 10 intentos fallidos bloquean 15 minutos, la cookie es HttpOnly (el JavaScript no la puede leer) y Zod valida cada dato antes de tocar la base."',
+        'PASE: "Eso es lo que no se ve. Ahora Juan Sebastián les muestra lo que sí ven en el celular."',
       ],
       repaso: {
         que: 'JWT (JSON Web Token): un token firmado con el usuario, su rol y su vencimiento (1 hora). Se guarda en la cookie st_session, HttpOnly. Un segundo token de 30 días lo renueva solo, con rotación.',
@@ -240,7 +241,7 @@ window.EXPO = {
 
     // ───────────────────────────── 2 · JUAN SEBASTIÁN ─────────────────────────────
     {
-      titulo: 'Frontend', quien: 1, seg: 65, pasos: 2, sena: [3, 7],
+      titulo: 'Frontend', quien: 1, seg: 55, pasos: 2, sena: [3, 7],
       publico: () => `
         <div class="s front">
           <div class="col-izq">
@@ -282,13 +283,13 @@ window.EXPO = {
       ],
     },
     {
-      titulo: 'Tres roles', quien: 1, seg: 65, pasos: 2, sena: [1, 2],
+      titulo: 'Tres roles', quien: 1, seg: 55, pasos: 2, sena: [1, 2],
       publico: () => `
         <div class="s roles">
           <h1 class="t1 a">3 roles · 3 vistas</h1>
           <div class="roles-fila">
             <div class="rol" data-p="0" style="--c:#4C8DFF"><div class="tel"><img src="img/app/app-03-estudiante-tablero.png" alt=""></div><b>Estudiante</b><span>ve y marca</span></div>
-            <div class="rol" data-p="1" style="--c:#22C9A6"><div class="tel"><img src="img/app/app-07-docente-nueva-tarea.png" alt=""></div><b>Monitor</b><span>publica</span></div>
+            <div class="rol" data-p="1" style="--c:#22C9A6"><div class="tel"><img src="img/app/app-07-monitor-nueva-tarea.png" alt=""></div><b>Monitor</b><span>publica</span></div>
             <div class="rol ancho" data-p="2" style="--c:#B07CFF"><div class="pc"><img src="img/app/app-08-admin-panel.png" alt=""></div><b>Administrador</b><span>controla</span></div>
           </div>
         </div>`,
@@ -315,7 +316,7 @@ window.EXPO = {
       ],
     },
     {
-      titulo: 'Se instala y avisa', quien: 1, seg: 60, pasos: 2, sena: [2, 7],
+      titulo: 'Se instala y avisa', quien: 1, seg: 50, pasos: 2, sena: [2, 7],
       publico: () => `
         <div class="s pwa">
           <div class="col-izq">
@@ -334,6 +335,7 @@ window.EXPO = {
         '[→] "Cuando el monitor publica una tarea, al grupo le llega una notificación aunque la app esté cerrada. La recibe un service worker, sw.js, que queda despierto en segundo plano."',
         '[→] "Y se adapta a cualquier pantalla: celular, tablet o computador."',
         'OJO: no decir que "recuerda" las entregas solo; los recordatorios automáticos no están activos.',
+        'PASE: "Todo eso se guarda en algún lado. Juan Diego les explica los datos y la inteligencia artificial."',
       ],
       repaso: {
         que: 'PWA (Progressive Web App): web instalable. Service worker: script que el navegador mantiene en segundo plano. Web Push: notificaciones del servidor al celular, firmadas con claves VAPID.',
@@ -355,7 +357,7 @@ window.EXPO = {
 
     // ───────────────────────────── 3 · JUAN DIEGO ─────────────────────────────
     {
-      titulo: 'Base de datos', quien: 2, seg: 75, pasos: 2, sena: [5, 11],
+      titulo: 'Base de datos', quien: 2, seg: 65, pasos: 2, sena: [5, 11],
       publico: () => `
         <div class="s bd">
           <h1 class="t1 a">MySQL: datos conectados</h1>
@@ -399,7 +401,7 @@ window.EXPO = {
       ],
     },
     {
-      titulo: 'Asistente de IA', quien: 2, seg: 60, pasos: 2, sena: [2, 3],
+      titulo: 'Asistente de IA', quien: 2, seg: 50, pasos: 2, sena: [2, 3],
       publico: () => `
         <div class="s ia">
           <h1 class="t1 a">Del dictado al formulario</h1>
@@ -437,7 +439,7 @@ window.EXPO = {
       ],
     },
     {
-      titulo: 'Imágenes', quien: 2, seg: 55, pasos: 2, sena: [6],
+      titulo: 'Imágenes', quien: 2, seg: 45, pasos: 2, sena: [6],
       publico: () => `
         <div class="s img">
           <h1 class="t1 a">La foto va a la nube</h1>
@@ -456,6 +458,7 @@ window.EXPO = {
         '"Esto último lo hace mirando los primeros bytes reales del archivo (magic bytes): un archivo disfrazado de .jpg no pasa."',
         '[→] "La foto se sube a Cloudinary, un servicio en la nube especializado en imágenes."',
         '[→] "Cloudinary devuelve un link, y en MySQL solo guardamos ese link. La base queda liviana."',
+        'PASE: "¿Y cómo llega todo esto a internet? Miguel Ángel les cuenta."',
       ],
       repaso: {
         que: 'Cloudinary: servicio en la nube que guarda imágenes y las entrega rápido (CDN). Magic bytes: la firma que tiene al inicio cada tipo de archivo.',
@@ -475,7 +478,7 @@ window.EXPO = {
 
     // ───────────────────────────── 4 · MIGUEL ÁNGEL ─────────────────────────────
     {
-      titulo: 'Docker', quien: 3, seg: 60, pasos: 2, sena: [3, 12],
+      titulo: 'Docker', quien: 3, seg: 50, pasos: 2, sena: [3, 12],
       publico: () => `
         <div class="s docker">
           <h1 class="t1 a">La app, en una caja</h1>
@@ -513,7 +516,7 @@ window.EXPO = {
       ],
     },
     {
-      titulo: 'Del PC a internet', quien: 3, seg: 60, pasos: 0, sena: [3, 9],
+      titulo: 'Del PC a internet', quien: 3, seg: 50, pasos: 0, sena: [3, 9],
       publico: () => `
         <div class="s tubo">
           <h1 class="t1 a">De mi PC a internet</h1>
@@ -549,7 +552,7 @@ window.EXPO = {
       ],
     },
     {
-      titulo: 'Calidad', quien: 3, seg: 70, pasos: 2, sena: [8, 9, 11],
+      titulo: 'Calidad', quien: 3, seg: 60, pasos: 2, sena: [8, 9, 11],
       publico: () => `
         <div class="s calidad">
           <h1 class="t1 a"><b class="contar" data-n="140">0</b> pruebas antes de publicar</h1>
@@ -564,6 +567,7 @@ window.EXPO = {
         '"Tenemos 140 pruebas automáticas con Vitest: sesión, permisos, validaciones, límites. En cada cambio, GitHub Actions corre revisión de estilo, tipos, las pruebas, la compilación y una auditoría de seguridad."',
         '[→] "Esto nos salvó: desde junio, los estudiantes y monitores no veían sus tareas. Una prueba reprodujo el error (el middleware respondía 403), lo arreglamos y la prueba pasó."',
         '[→] "Además, cada noche se saca un respaldo de la base con mysqldump, y si falla el internet tenemos el modo offline."',
+        'PASE: "Jerónimo, ¿cerramos?"',
       ],
       repaso: {
         que: 'Prueba automática: código que revisa que otro código haga lo que debe. CI (integración continua): correr todas las revisiones solas en cada cambio.',
@@ -584,7 +588,7 @@ window.EXPO = {
 
     // ───────────────────────────── CIERRE ─────────────────────────────
     {
-      titulo: 'Pruébalo', quien: 0, seg: 45, pasos: 1, sena: [10],
+      titulo: 'Pruébalo', quien: 0, seg: 40, pasos: 1, sena: [10],
       publico: () => `
         <div class="s pruebalo">
           <div class="qr-lado a" style="--d:.2s"><img src="img/qr-probar.png" alt="QR para probar ClassHub"><b>Pruébalo ya</b></div>

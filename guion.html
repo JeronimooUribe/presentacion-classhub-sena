@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ClassHub · Guion por persona</title>
+  <meta name="theme-color" content="#080D1F">
+  <link rel="icon" href="img/logo.png">
+  <link rel="stylesheet" href="vendor/ph/bold.css">
+  <link rel="stylesheet" href="vendor/ph/fill.css">
+  <link rel="stylesheet" href="presentador.css">
+  <style>
+    body.guion { display: block; overflow: auto; height: auto; }
+    .g-cab { position: sticky; top: 0; z-index: 5; background: #0B1128; border-bottom: 1px solid var(--borde); padding: 12px 16px; }
+    .g-cab h1 { margin: 0 0 10px; font-size: 18px; display: flex; align-items: center; gap: 10px; }
+    .g-cab h1 img { width: 30px; height: 30px; border-radius: 8px; }
+    .personas { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 2px; }
+    .personas a { flex: none; text-decoration: none; padding: 8px 14px; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--p) 55%, transparent); font-weight: 700; font-size: 14px; }
+    .personas a.activa { background: var(--p); color: #061024; }
+    .g-cuerpo { max-width: 760px; margin: 0 auto; padding: 16px 16px 60px; }
+    .resumen { background: var(--panel); border: 1px solid var(--borde); border-radius: 16px; padding: 16px 18px; margin-bottom: 14px; }
+    .resumen h2 { margin: 0 0 6px; font-size: 22px; }
+    .resumen p { margin: 4px 0; color: #D7E0FA; line-height: 1.5; }
+    .orden { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .orden span { font-size: 12.5px; font-weight: 700; padding: 4px 9px; border-radius: 8px; border: 1px solid color-mix(in srgb, var(--p) 50%, transparent); opacity: 0.55; }
+    .orden span.mia { background: var(--p); color: #061024; opacity: 1; }
+    .diapo { background: var(--panel); border: 1px solid var(--borde); border-radius: 18px; margin-bottom: 16px; overflow: hidden; }
+    .diapo-cab { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--borde); }
+    .diapo-cab .n { font-weight: 800; background: var(--p); color: #061024; border-radius: 8px; padding: 2px 9px; }
+    .diapo-cab b { font-size: 18px; }
+    .diapo-cab small { margin-left: auto; color: var(--suave); white-space: nowrap; }
+    .diapo .marco { border-radius: 0; border: 0; border-bottom: 1px solid var(--borde); }
+    .diapo .dentro { padding: 14px 16px; }
+    .diapo h3 { margin: 14px 0 8px; font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--p); }
+    .diapo h3:first-child { margin-top: 0; }
+    .diapo ol { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
+    .diapo li { font-size: 17px; line-height: 1.45; padding: 8px 10px; border-radius: 10px; background: rgba(255,255,255,.03); }
+    .diapo p { margin: 0 0 6px; line-height: 1.5; }
+    .idea { font-size: 17px; font-weight: 600; color: #fff; }
+    .tip { border: 1px dashed rgba(255,255,255,.25); border-radius: 12px; padding: 10px 12px; color: #FFE2A8; font-size: 15px; }
+  </style>
+</head>
+<body class="guion">
+  <header class="g-cab">
+    <h1><img src="img/logo.png" alt="">Guion por persona</h1>
+    <nav id="personas" class="personas"></nav>
+  </header>
+  <main id="cuerpo" class="g-cuerpo"></main>
+  <script src="contenido.js"></script>
+  <script>
+    (() => {
+      const E = window.EXPO;
+      const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+      const mmss = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+      const linea = t => {
+        const clic = t.startsWith('[→]');
+        let x = esc(clic ? t.slice(3).trim() : t)
+          .replace(/^OJO:/, '<b class="ojo">OJO:</b>')
+          .replace(/^PASE:/, '<b class="pase">PASA LA PALABRA:</b>');
+        return `<li>${clic ? '<span class="clic">clic</span>' : ''}${x}</li>`;
+      };
+
+      function pintar() {
+        const i = Math.max(0, Math.min(3, Number(location.hash.slice(1)) || 0));
+        const p = E.equipo[i];
+        document.documentElement.style.setProperty('--p', p.color);
+        document.getElementById('personas').innerHTML = E.equipo.map((x, k) =>
+          `<a href="#${k}" style="--p:${x.color}" class="${k === i ? 'activa' : ''}">${esc(x.corto)}</a>`).join('');
+
+        const mias = E.slides.map((s, n) => ({ s, n })).filter(o => o.s.quien === i);
+        const total = mias.reduce((a, o) => a + o.s.seg, 0);
+        const antes = E.slides[mias[0].n - 1], despues = E.slides[mias[mias.length - 1].n + 1];
+        const sena = E.sena.filter(q => q.quien === i);
+
+        document.getElementById('cuerpo').innerHTML = `
+          <section class="resumen" style="--p:${p.color}">
+            <h2>${esc(p.n)}</h2>
+            <p><b>Tu tema:</b> ${esc(p.tema)} · <b>${mias.length} diapositivas</b> · unos <b>${mmss(total)}</b> minutos.</p>
+            <p>${antes ? `Antes de ti habla <b>${esc(E.equipo[antes.quien].corto)}</b>: te pasa la palabra en la diapositiva ${mias[0].n}.` : 'Tú abres la exposición.'}
+               ${despues && E.slides[mias[mias.length - 1].n + 1].quien !== i ? ` Al terminar, le pasas la palabra a <b>${esc(E.equipo[despues.quien].corto)}</b>.` : ''}</p>
+            <div class="orden">${E.slides.map((s, n) => `<span style="--p:${E.equipo[s.quien].color}" class="${s.quien === i ? 'mia' : ''}">${n + 1}</span>`).join('')}</div>
+          </section>
+          <p class="tip">Si te bloqueas: lee "La idea" de tu diapositiva y dila con tus palabras. No hace falta decirlo igual; Jerónimo te apoya.${i === 0 ? ' Tú apoyas a los demás reforzando conceptos.' : ''}</p>
+          ${mias.map(({ s, n }) => `
+            <article class="diapo" style="--p:${p.color}">
+              <div class="diapo-cab"><span class="n">${n + 1}</span><b>${esc(s.titulo)}</b><small>${mmss(s.seg)} min</small></div>
+              <div class="marco"><iframe loading="lazy" src="publico.html?fijo=${n}&paso=99" title="Diapositiva ${n + 1}" tabindex="-1"></iframe></div>
+              <div class="dentro">
+                ${s.repaso ? `<h3>La idea</h3><p class="idea">${esc(s.repaso.que)}</p>` : ''}
+                <h3>Qué decir ("clic" = pasa la diapositiva)</h3><ol>${s.guion.map(linea).join('')}</ol>
+                ${s.repaso ? `<h3>Cómo funciona por dentro</h3><p>${esc(s.repaso.como)}</p>` : ''}
+                ${s.analogia ? `<h3>Analogía</h3><p style="color:#FFE2A8">${esc(s.analogia)}</p>` : ''}
+                ${s.preguntas.length ? `<h3>Si te preguntan</h3>${s.preguntas.map(q => `<details><summary>${esc(q.p)}</summary><p>${esc(q.r)}</p></details>`).join('')}` : ''}
+              </div>
+            </article>`).join('')}
+          ${sena.length ? `<section class="resumen" style="--p:${p.color}"><h2>Preguntas de la profe que respondes tú</h2>
+            ${sena.map(q => `<details><summary>P${q.id}. ${esc(q.p)}</summary><p>${esc(q.r)}</p></details>`).join('')}</section>` : ''}`;
+        scrollTo(0, 0);
+      }
+      addEventListener('hashchange', pintar);
+      pintar();
+    })();
+  </script>
+</body>
+</html>
