@@ -104,14 +104,25 @@ ${conocimiento()}`;
 async function llamarClaude(mensajes) {
   let ultimoError;
   for (const modelo of MODELOS) {
-    const r = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json', 'x-api-key': CLAVE, 'anthropic-version': '2023-06-01' },
-      body: JSON.stringify({
-        model: modelo, max_tokens: 700, tools: HERRAMIENTAS, messages: mensajes,
-        system: [{ type: 'text', text: SISTEMA, cache_control: { type: 'ephemeral' } }],
-      }),
+    const cuerpo = JSON.stringify({
+      model: modelo, max_tokens: 700, tools: HERRAMIENTAS, messages: mensajes,
+      system: [{ type: 'text', text: SISTEMA, cache_control: { type: 'ephemeral' } }],
     });
+    let r;
+    // Un corte de red momentáneo no debe dejar al expositor sin respuesta: hasta 3 intentos.
+    for (let intento = 1; ; intento++) {
+      try {
+        r = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json', 'x-api-key': CLAVE, 'anthropic-version': '2023-06-01' },
+          body: cuerpo,
+        });
+        break;
+      } catch (e) {
+        if (intento >= 3) throw new Error('sin conexión a internet (' + e.message + ')');
+        await new Promise(ok => setTimeout(ok, 700 * intento));
+      }
+    }
     const j = await r.json().catch(() => ({}));
     if (r.ok) return { ...j, modelo };
     ultimoError = j.error?.message || `HTTP ${r.status}`;
