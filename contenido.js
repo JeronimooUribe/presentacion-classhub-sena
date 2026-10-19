@@ -622,7 +622,7 @@ window.EXPO = {
         '"Next.js y TypeScript, MySQL, desplegada en Railway, con 140 pruebas y respaldo diario. Gracias. Respondemos sus preguntas."',
         'Durante preguntas: Jerónimo reparte. "Eso lo trabajó [nombre], que les explica."',
       ],
-      repaso: { que: 'Abre el panel "Preguntas SENA" para tener las 13 respuestas a la mano.', como: 'Si piden ver código: abre el enlace del panel y VS Code va directo a la línea.' },
+      repaso: { que: 'Abre el panel "Preguntas SENA" para tener las 13 respuestas a la mano.', como: 'Si piden ver código: abre el enlace del panel y Antigravity va directo a la línea.' },
       analogia: '',
       codigo: [],
       preguntas: [],

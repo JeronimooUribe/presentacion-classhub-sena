@@ -7,12 +7,14 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
+import { spawn } from 'node:child_process';
 
 const AQUI = path.dirname(fileURLToPath(import.meta.url));
 const RAIZ = path.resolve(AQUI, '..');
 const PUERTO = Number(process.env.PUERTO || 5190);
 const REPO = path.resolve(process.env.CLASSHUB_REPO || path.join(RAIZ, '../../Proyectos_programacion/Proyecto_tareas/ClassHub - Codigo'));
 const TABLERO = path.resolve(RAIZ, '../tablero');
+const ANTIGRAVITY = process.env.ANTIGRAVITY || path.join(process.env.LOCALAPPDATA || '', 'Programs', 'Antigravity IDE', 'Antigravity IDE.exe');
 const MODELOS = (process.env.MODELOS || 'claude-sonnet-5-5,claude-haiku-5-5,claude-sonnet-4-6').split(',');
 const ORIGENES = new Set(['https://jeronimoouribe.github.io', `http://127.0.0.1:${PUERTO}`, `http://localhost:${PUERTO}`]);
 
@@ -94,7 +96,7 @@ CÓMO RESPONDER (obligatorio):
 - Español claro. Máximo 3 frases cortas, menos de 60 palabras. Sin títulos, sin listas, sin saludos ni cierres.
 - Si piden una diferencia o comparación: una línea por concepto ("API: …" y "HTTPS: …") y una línea con el ejemplo real en ClassHub.
 - Si preguntan dónde está algo, cómo funciona en el código o qué pasa si se borra una línea: busca con las herramientas y LEE el archivo para confirmar la línea antes de citarla. Nunca inventes rutas ni números de línea.
-- Cita ubicaciones exactamente así: [[ruta/del/archivo.ts:123]] (máximo 3). El sistema las convierte en enlaces que abren VS Code en esa línea.
+- Cita ubicaciones exactamente así: [[ruta/del/archivo.ts:123]] (máximo 3). El sistema las convierte en enlaces que abren Antigravity en esa línea.
 - Usa los nombres reales (funciones, tablas, archivos). Si algo no existe en ClassHub, dilo en una frase.
 - También puedes explicar conceptos generales de programación del mundo real, en corto, y conectarlos con ClassHub.
 - Sé honesto con la deuda técnica (códigos en texto plano, recordatorios sin cron activo, Sentry sin clave, sin pruebas E2E).
@@ -234,6 +236,19 @@ const servidor = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://127.0.0.1:${PUERTO}`);
 
   if (url.pathname === '/api/estado') return json(res, 200, { ok: true, ia: Boolean(CLAVE), respaldo: BASE.length, archivos: archivos.size, modelo: MODELOS[0] });
+
+  // Abre un archivo del proyecto en Antigravity IDE en la línea pedida (solo archivos conocidos del repositorio).
+  if (url.pathname === '/api/abrir') {
+    const ruta = String(url.searchParams.get('f') || '').replace(/\\/g, '/').replace(/^\.?\//, '');
+    const linea = Math.max(1, parseInt(url.searchParams.get('l'), 10) || 1);
+    const abs = path.resolve(REPO, ruta);
+    const esCarpeta = !archivos.has(ruta) && abs.startsWith(REPO + path.sep) && fs.existsSync(abs) && fs.statSync(abs).isDirectory();
+    if (!archivos.has(ruta) && !esCarpeta) return json(res, 404, { error: 'Archivo no encontrado en ClassHub' });
+    if (!fs.existsSync(ANTIGRAVITY)) return json(res, 503, { error: 'No encontré Antigravity IDE' });
+    const args = esCarpeta ? ['-r', REPO] : ['-r', REPO, '-g', `${abs}:${linea}`];
+    spawn(ANTIGRAVITY, args, { detached: true, stdio: 'ignore', windowsHide: false }).unref();
+    return json(res, 200, { ok: true });
+  }
 
   if (url.pathname === '/api/preguntar' && req.method === 'POST') {
     let cuerpo = '';

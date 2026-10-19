@@ -4,8 +4,9 @@
   const E = window.EXPO, M = window.MOTOR;
   const $ = s => document.querySelector(s);
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const vscode = (f, l) => `vscode://file/${encodeURI(`${E.repo}/${f}`)}${l ? `:${l}` : ''}`;
-  const enlace = ([t, f, l]) => `<a class="cod" href="${vscode(f, l)}" title="Abrir en VS Code"><i class="ph-bold ph-code"></i><span>${esc(t)}</span><small>${esc(f)}${l ? `:${l}` : ''}</small></a>`;
+  // Enlace al código en Antigravity IDE. En el portátil el servidor lo abre directo (sin la ventanita del navegador).
+  const vscode = (f, l) => `antigravity-ide://file/${encodeURI(`${E.repo}/${f}`)}${l ? `:${l}` : ''}`;
+  const enlace = ([t, f, l]) => `<a class="cod" href="${vscode(f, l)}" title="Abrir en Antigravity"><i class="ph-bold ph-code"></i><span>${esc(t)}</span><small>${esc(f)}${l ? `:${l}` : ''}</small></a>`;
   const mmss = s => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 
   // ---------- Notas de la diapositiva ----------
@@ -31,7 +32,7 @@
       ${sl.repaso ? `<div class="bloque repaso"><h3><i class="ph-bold ph-book-open-text"></i>Repaso</h3>
         <p><b>Qué es.</b> ${esc(sl.repaso.que)}</p><p><b>Cómo funciona.</b> ${esc(sl.repaso.como)}</p></div>` : ''}
       ${sl.analogia ? `<div class="bloque analogia"><h3><i class="ph-bold ph-lightbulb"></i>Analogía</h3><p>${esc(sl.analogia)}</p></div>` : ''}
-      ${sl.codigo.length ? `<div class="bloque"><h3><i class="ph-bold ph-folder-open"></i>En el código <small>clic = abre VS Code en la línea</small></h3><div class="codigos">${sl.codigo.map(enlace).join('')}</div></div>` : ''}
+      ${sl.codigo.length ? `<div class="bloque"><h3><i class="ph-bold ph-folder-open"></i>En el código <small>clic = abre Antigravity en la línea</small></h3><div class="codigos">${sl.codigo.map(enlace).join('')}</div></div>` : ''}
       ${sl.preguntas.length ? `<div class="bloque"><h3><i class="ph-bold ph-question"></i>Pueden preguntar</h3>${sl.preguntas.map(q => `<details><summary>${esc(q.p)}</summary><p>${esc(q.r)}</p></details>`).join('')}</div>` : ''}`;
 
     // Puntos de pasos y tira de diapositivas
@@ -137,6 +138,22 @@
   red();
   $('#sena [data-cerrar]').onclick = () => { $('#sena').hidden = true; };
 
+  // ---------- Abrir código en Antigravity ----------
+  // Si la presentación corre en el portátil (servidor local), el servidor abre Antigravity en la línea.
+  // Desde la nube se usa el enlace antigravity-ide:// tal cual.
+  document.addEventListener('click', async e => {
+    const a = e.target.closest('a[href^="antigravity-ide://file/"]');
+    if (!a || location.port !== '5190') return;
+    e.preventDefault();
+    const m = decodeURI(a.getAttribute('href').slice('antigravity-ide://file/'.length)).match(/^(.*?)(?::(\d+))?$/);
+    const ruta = m[1].startsWith(E.repo + '/') ? m[1].slice(E.repo.length + 1) : m[1];
+    try {
+      const r = await fetch(`/api/abrir?f=${encodeURIComponent(ruta)}&l=${m[2] || 1}`);
+      if (!r.ok) throw new Error((await r.json()).error || r.status);
+      aviso(`Abriendo ${ruta}${m[2] ? ':' + m[2] : ''} en Antigravity…`);
+    } catch (err) { location.href = a.getAttribute('href'); }
+  });
+
   // ---------- Asistente de IA ----------
   const BASE = location.port === '5190' ? '' : 'http://127.0.0.1:5190';
   const historial = [];
@@ -165,7 +182,7 @@
   $('#ia').addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Escape') $('#ia').hidden = true; });
   $('.ia-sugerencias').addEventListener('click', e => { const b = e.target.closest('button'); if (b) enviar(b.textContent); });
 
-  // Convierte la respuesta: [[ruta:línea]] → enlace a VS Code, **negrita**, `código`.
+  // Convierte la respuesta: [[ruta:línea]] → enlace a Antigravity, **negrita**, `código`.
   function formatear(t) {
     return esc(t)
       .replace(/\[\[([^\]:]+?)(?::(\d+))?\]\]/g, (_, f, l) => `<a class="cod-mini" href="${vscode(f.trim(), l)}"><i class="ph-bold ph-code"></i>${esc(f.trim())}${l ? `:${l}` : ''}</a>`)
