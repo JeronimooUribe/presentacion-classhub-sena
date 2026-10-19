@@ -41,12 +41,12 @@ window.EXPO = {
         <div class="s gancho">
           <h1 class="t1 centro pregunta a" data-hasta="1">¿Qué tarea había<br>para mañana?</h1>
           <div class="burbujas" data-p="1" data-hasta="1">
-            <span style="--x:6%;--y:52%;--r:-4deg">¿Alguien copió la tarea?</span>
-            <span style="--x:58%;--y:48%;--r:3deg">¿Para cuándo era?</span>
-            <span style="--x:16%;--y:70%;--r:2deg">No vine ayer 😅</span>
-            <span style="--x:52%;--y:68%;--r:-3deg">¿En hoja o en el cuaderno?</span>
-            <span style="--x:30%;--y:86%;--r:-2deg">El profe lo dijo en clase…</span>
-            <span style="--x:66%;--y:86%;--r:3deg">Se perdió en el WhatsApp 🙃</span>
+            <span style="--x:5%;--y:46%;--r:-4deg">¿Alguien copió la tarea?</span>
+            <span style="--x:58%;--y:44%;--r:3deg">¿Para cuándo era?</span>
+            <span style="--x:12%;--y:62%;--r:2deg">No vine ayer 😅</span>
+            <span style="--x:50%;--y:61%;--r:-3deg">¿En hoja o en el cuaderno?</span>
+            <span style="--x:8%;--y:78%;--r:-2deg">El profe lo dijo en clase…</span>
+            <span style="--x:50%;--y:78%;--r:3deg">Se perdió en el WhatsApp 🙃</span>
           </div>
           <div class="solucion" data-p="2">
             <div class="tel grande"><img src="img/app/app-03-estudiante-tablero.png" alt=""></div>
