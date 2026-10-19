@@ -76,7 +76,7 @@
           <section class="resumen" style="--p:${p.color}">
             <h2>${esc(p.n)}</h2>
             <p><b>Tu tema:</b> ${esc(p.tema)} · <b>${mias.length} diapositivas</b> · unos <b>${mmss(total)}</b> minutos.</p>
-            <p>${antes ? `Antes de ti habla <b>${esc(E.equipo[antes.quien].corto)}</b>: te pasa la palabra en la diapositiva ${mias[0].n}.` : 'Tú abres la exposición.'}
+            <p>${antes ? `Antes de ti habla <b>${esc(E.equipo[antes.quien].corto)}</b>: al terminar la diapositiva ${mias[0].n} te pasa la palabra y tú arrancas en la <b>${mias[0].n + 1}</b>.` : 'Tú abres la exposición.'}
                ${despues && E.slides[mias[mias.length - 1].n + 1].quien !== i ? ` Al terminar, le pasas la palabra a <b>${esc(E.equipo[despues.quien].corto)}</b>.` : ''}</p>
             <div class="orden">${E.slides.map((s, n) => `<span style="--p:${E.equipo[s.quien].color}" class="${s.quien === i ? 'mia' : ''}">${n + 1}</span>`).join('')}</div>
           </section>
