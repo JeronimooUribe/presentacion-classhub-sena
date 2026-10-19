@@ -269,3 +269,21 @@ code { font-family: 'Mono', Consolas, monospace; background: color-mix(in srgb, 
 .siguiente span { padding: 12px 24px; border-radius: 999px; border: 2px dashed rgba(255,255,255,.3); }
 .img-fila .paso-img:first-child { min-width: 500px; }
 .checks span { white-space: nowrap; }
+
+/* Diapositiva 16: cuenta de prueba visible y manual de uso */
+.pruebalo { grid-template-columns: 600px 1fr; grid-template-rows: auto auto auto; gap: 26px 80px; align-content: center; }
+.qr-lado { grid-row: 1 / 4; gap: 22px; }
+.qr-lado img { width: 440px; }
+.cuenta { display: grid; grid-template-columns: auto 1fr; gap: 6px 18px; align-items: baseline; background: rgba(255,255,255,.07); border: 2px solid var(--c); border-radius: 24px; padding: 20px 28px; }
+.cuenta span { font-size: 28px; color: var(--suave); font-weight: 700; }
+.cuenta b { font-family: 'Mono', monospace; font-size: 40px; color: #fff; }
+.numeros { grid-column: 2; gap: 18px; }
+.numero { padding: 18px 14px; }
+.numero b { font-size: 84px; }
+.numero span { font-size: 30px; }
+.manual { grid-column: 2; display: flex; flex-direction: column; gap: 10px; }
+.manual p { margin: 0; display: flex; align-items: center; gap: 18px; font-size: 40px; font-weight: 700; }
+.manual i { font-style: normal; width: 58px; height: 58px; flex: none; border-radius: 50%; background: var(--c); color: #061024; display: grid; place-items: center; font-size: 34px; font-weight: 800; }
+.siguiente { grid-column: 2; font-size: 30px; }
+.siguiente b { font-size: 32px; }
+.cuenta b { font-size: 33px; } .cuenta { padding: 18px 22px; }

@@ -589,7 +589,11 @@ window.EXPO = {
       titulo: 'Pruébalo', quien: 0, seg: 40, pasos: 1, sena: [10],
       publico: () => `
         <div class="s pruebalo">
-          <div class="qr-lado a" style="--d:.2s"><img src="img/qr-probar.png" alt="QR para probar ClassHub"><b>Pruébalo ya</b></div>
+          <div class="qr-lado a" style="--d:.2s"><img src="img/qr-probar.png" alt="QR para probar ClassHub">
+            <div class="cuenta"><span>Correo</span><b>estudiante@classhub.demo</b><span>Código</span><b>demo2026</b></div></div>
+          <div class="manual a" style="--d:.5s">
+            <p><i>1</i>Escanea el QR</p><p><i>2</i>Escribe el correo y el código</p><p><i>3</i>Marca una tarea: pendiente → completada</p>
+          </div>
           <div class="numeros">
             ${[[17, 'tablas'], [37, 'rutas de API'], [140, 'pruebas'], [105, 'archivos'], [74, 'commits'], [3, 'roles']].map(([n, t], i) => `
               <div class="numero a" style="--d:${0.3 + i * 0.12}s"><b class="contar" data-n="${n}">0</b><span>${t}</span></div>`).join('')}
@@ -597,7 +601,8 @@ window.EXPO = {
           <div class="siguiente" data-p="1"><b>Lo que sigue</b><span>Recordatorios automáticos</span><span>Códigos con hash</span><span>Pruebas E2E</span></div>
         </div>`,
       guion: [
-        '"Pueden probarlo ya: escaneen el QR y entren como estudiante de prueba."',
+        '"Pueden probarlo ya: escaneen el QR y entren con el correo y el código que ven en pantalla. Es una cuenta de prueba para todos."',
+        '"Dentro: vean sus tareas, filtren por materia y marquen una como completada."',
         '"En números: 17 tablas, 37 rutas de API, 140 pruebas, 105 archivos de código y 74 commits."',
         '[→] "Lo que sigue: activar los recordatorios automáticos, guardar los códigos con hash (bcrypt ya está en el código) y pruebas de punta a punta."',
       ],
