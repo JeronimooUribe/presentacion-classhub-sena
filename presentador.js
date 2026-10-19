@@ -155,7 +155,13 @@
   });
 
   // ---------- Asistente de IA ----------
-  const BASE = location.port === '5190' ? '' : 'http://127.0.0.1:5190';
+  // En el portátil habla con su servidor local; desde la nube, con el asistente desplegado en Railway (pide PIN).
+  const NUBE = 'https://asistente-production-0007.up.railway.app';
+  const BASE = location.port === '5190' ? '' : NUBE;
+  const CLAVE_PIN = 'classhub-expo-pin';
+  let pin = '';
+  try { pin = localStorage.getItem(CLAVE_PIN) || ''; } catch { /* sin almacenamiento */ }
+  const guardarPin = v => { pin = v; try { localStorage.setItem(CLAVE_PIN, v); } catch { /* sin almacenamiento */ } };
   const historial = [];
   let iaLista = false;
   async function estadoIA() {
@@ -163,13 +169,11 @@
       const r = await fetch(`${BASE}/api/estado`, { cache: 'no-store' });
       const j = await r.json();
       iaLista = j.ok && j.ia;
-      $('#ia-estado').textContent = iaLista ? `conectado · ${j.archivos} archivos de código` : 'sin clave de IA';
+      $('#ia-estado').textContent = !iaLista ? 'sin clave de IA' : `conectado${BASE ? ' (nube)' : ''} · ${j.archivos} archivos${j.pin && !pin ? ' · falta el PIN' : ''}`;
     } catch {
       iaLista = false;
       // Desde la nube el navegador no deja hablar con el portátil: se ofrece saltar a la versión local.
-      $('#ia-estado').innerHTML = BASE
-        ? 'solo en el portátil: <a href="http://127.0.0.1:5190/">abrir versión con asistente</a>'
-        : 'apagado: abre con ABRIR PRESENTACION.bat';
+      $('#ia-estado').textContent = BASE ? 'sin conexión con el asistente' : 'apagado: abre con ABRIR PRESENTACION.bat';
     }
     $('#ia-punto').classList.toggle('on', iaLista);
   }
@@ -205,10 +209,11 @@
     const t0 = Date.now();
     try {
       const res = await fetch(`${BASE}/api/preguntar`, {
-        method: 'POST', headers: { 'content-type': 'application/json' },
+        method: 'POST', headers: { 'content-type': 'application/json', 'x-pin': pin },
         body: JSON.stringify({ pregunta, historial, diapo: `${M.estado.s + 1}. ${E.slides[M.estado.s].titulo}` }),
       });
       const j = await res.json();
+      if (res.status === 401) { pedirPin(r, pregunta); burbuja.querySelector('.q').remove(); return; }
       if (!res.ok) throw new Error(j.error || 'Error');
       r.classList.remove('cargando');
       if (j.respaldo) r.classList.add('respaldo');
@@ -217,12 +222,20 @@
     } catch (e) {
       r.classList.remove('cargando');
       r.classList.add('error');
-      if (iaLista) r.textContent = `No respondió (${e.message}). Intenta de nuevo.`;
-      else r.innerHTML = BASE
-        ? 'El asistente solo funciona en la versión local. Abre el acceso directo "Presentacion ClassHub" del escritorio o <a href="http://127.0.0.1:5190/">esta versión</a> si ya está encendido.'
+      r.textContent = iaLista ? `No respondió (${e.message}). Intenta de nuevo.`
+        : BASE ? 'No hay conexión con el asistente. Revisa el internet; sin internet, usa el acceso directo del escritorio (responde con respuestas guardadas).'
         : 'El asistente está apagado. Abre el acceso directo "Presentacion ClassHub" del escritorio.';
     }
     chat.scrollTop = chat.scrollHeight;
   }
+  // Pide el PIN del equipo una sola vez (queda guardado en este navegador) y repite la pregunta.
+  function pedirPin(r, pregunta) {
+    r.classList.remove('cargando');
+    r.innerHTML = '<form class="pin-form"><b>PIN del equipo</b><input inputmode="numeric" autocomplete="off" placeholder="6 dígitos"><button>Entrar</button></form>' + (pin ? '<small class="seg">El PIN guardado no es correcto.</small>' : '');
+    const f = r.querySelector('form');
+    f.querySelector('input').focus();
+    f.addEventListener('submit', ev => { ev.preventDefault(); guardarPin(f.querySelector('input').value.trim()); r.closest('.ia-par').remove(); estadoIA(); enviar(pregunta); });
+  }
+
   $('#ia-form').addEventListener('submit', e => { e.preventDefault(); const q = $('#ia-q').value; $('#ia-q').value = ''; enviar(q); });
 })();

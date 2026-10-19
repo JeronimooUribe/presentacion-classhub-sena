@@ -11,9 +11,13 @@ import { spawn } from 'node:child_process';
 
 const AQUI = path.dirname(fileURLToPath(import.meta.url));
 const RAIZ = path.resolve(AQUI, '..');
-const PUERTO = Number(process.env.PUERTO || 5190);
+const PUERTO = Number(process.env.PORT || process.env.PUERTO || 5190);
+// En la nube escucha en todas las interfaces; en el portátil, solo en 127.0.0.1.
+const HOST = process.env.HOST || (process.env.PORT ? '0.0.0.0' : '127.0.0.1');
+// PIN del equipo: si existe, /api/preguntar lo exige (así nadie más gasta la clave ni lee el código).
+const PIN = process.env.PIN || '';
 const REPO = path.resolve(process.env.CLASSHUB_REPO || path.join(RAIZ, '../../Proyectos_programacion/Proyecto_tareas/ClassHub - Codigo'));
-const TABLERO = path.resolve(RAIZ, '../tablero');
+const TABLERO = path.resolve(process.env.TABLERO_DIR || path.join(RAIZ, '../tablero'));
 const ANTIGRAVITY = process.env.ANTIGRAVITY || path.join(process.env.LOCALAPPDATA || '', 'Programs', 'Antigravity IDE', 'Antigravity IDE.exe');
 const MODELOS = (process.env.MODELOS || 'claude-sonnet-5-5,claude-haiku-5-5,claude-sonnet-4-6').split(',');
 const ORIGENES = new Set(['https://jeronimoouribe.github.io', `http://127.0.0.1:${PUERTO}`, `http://localhost:${PUERTO}`]);
@@ -215,6 +219,21 @@ function respuestaSinInternet(pregunta) {
   return { texto: 'Sin internet · respuesta guardada: ' + texto, modelo: 'respaldo local', respaldo: true };
 }
 
+// ---------- Acceso ----------
+import crypto from 'node:crypto';
+function pinValido(dado) {
+  const a = Buffer.from(String(dado || '')), b = Buffer.from(PIN);
+  return a.length === b.length && crypto.timingSafeEqual(a, b);
+}
+// Límite simple por IP: 40 preguntas cada 10 minutos.
+const visitas = new Map();
+function dentroDelLimite(req) {
+  const ip = String(req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim();
+  const ahora = Date.now(), lista = (visitas.get(ip) || []).filter(t => ahora - t < 600_000);
+  lista.push(ahora); visitas.set(ip, lista);
+  return lista.length <= 40;
+}
+
 // ---------- HTTP ----------
 const TIPOS = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.json': 'application/json', '.ico': 'image/x-icon', '.webp': 'image/webp' };
 
@@ -224,7 +243,7 @@ function cors(req, res) {
     res.setHeader('Access-Control-Allow-Origin', o);
     res.setHeader('Vary', 'Origin');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'content-type');
+    res.setHeader('Access-Control-Allow-Headers', 'content-type, x-pin');
     res.setHeader('Access-Control-Allow-Private-Network', 'true');
   }
 }
@@ -235,7 +254,7 @@ const servidor = http.createServer(async (req, res) => {
   if (req.method === 'OPTIONS') { res.writeHead(204); return res.end(); }
   const url = new URL(req.url, `http://127.0.0.1:${PUERTO}`);
 
-  if (url.pathname === '/api/estado') return json(res, 200, { ok: true, ia: Boolean(CLAVE), respaldo: BASE.length, archivos: archivos.size, modelo: MODELOS[0] });
+  if (url.pathname === '/api/estado') return json(res, 200, { ok: true, ia: Boolean(CLAVE), pin: Boolean(PIN), respaldo: BASE.length, archivos: archivos.size, modelo: MODELOS[0] });
 
   // Abre un archivo del proyecto en Antigravity IDE en la línea pedida (solo archivos conocidos del repositorio).
   if (url.pathname === '/api/abrir') {
@@ -251,6 +270,8 @@ const servidor = http.createServer(async (req, res) => {
   }
 
   if (url.pathname === '/api/preguntar' && req.method === 'POST') {
+    if (PIN && !pinValido(req.headers['x-pin'])) return json(res, 401, { error: 'PIN incorrecto', pin: true });
+    if (!dentroDelLimite(req)) return json(res, 429, { error: 'Demasiadas preguntas seguidas; espera un minuto.' });
     let cuerpo = '';
     for await (const trozo of req) { cuerpo += trozo; if (cuerpo.length > 20_000) return json(res, 413, { error: 'Pregunta muy larga' }); }
     try {
@@ -273,6 +294,9 @@ const servidor = http.createServer(async (req, res) => {
     }
   }
 
+  // En la nube solo hay API: nunca se sirven archivos (el código de ClassHub es privado).
+  if (process.env.SOLO_API === '1') { res.writeHead(404); return res.end(); }
+
   // Archivos estáticos de la presentación (sin salir de la carpeta).
   let ruta = decodeURIComponent(url.pathname);
   if (ruta === '/') ruta = '/index.html';
@@ -285,7 +309,7 @@ const servidor = http.createServer(async (req, res) => {
   });
 });
 
-servidor.listen(PUERTO, '127.0.0.1', () => {
+servidor.listen(PUERTO, HOST, () => {
   console.log(`Presentación ClassHub: http://127.0.0.1:${PUERTO}`);
   console.log(`Asistente IA: ${CLAVE ? 'listo' : 'SIN CLAVE'} · ${archivos.size} archivos de código · ${BASE.length} respuestas guardadas para usar sin internet`);
 });

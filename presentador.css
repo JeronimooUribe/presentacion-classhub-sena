@@ -166,3 +166,6 @@ details p { margin: 8px 0 0; color: #D7E0FA; }
 .plan .sena-item p b { color: #fff; }
 .ia-par .r.respaldo { border: 1px dashed var(--ambar); }
 a.btn { text-decoration: none; }
+.pin-form { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.pin-form input { width: 110px; font: inherit; font-size: 16px; letter-spacing: 0.2em; color: var(--texto); background: var(--fondo); border: 1px solid #B07CFF; border-radius: 8px; padding: 6px 10px; }
+.pin-form button { border: 0; border-radius: 8px; padding: 7px 12px; background: #B07CFF; color: #10072A; font-weight: 800; }
