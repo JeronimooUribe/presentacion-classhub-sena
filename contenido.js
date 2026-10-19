@@ -30,7 +30,7 @@ window.EXPO = {
         '"Les presentamos ClassHub, nuestro proyecto de grado."',
         'Pasar rápido: la portada no se explica.',
       ],
-      repaso: { que: 'ClassHub es una aplicación web full-stack: los docentes publican tareas por grupo y los estudiantes las ven y marcan su avance desde el celular.', como: 'Next.js + TypeScript (frontend y backend), MySQL (datos), desplegada en Railway con Docker.' },
+      repaso: { que: 'ClassHub es una aplicación web full-stack: el monitor de tareas de cada salón publica las tareas y los estudiantes las ven y marcan su avance desde el celular.', como: 'Next.js + TypeScript (frontend y backend), MySQL (datos), desplegada en Railway con Docker.' },
       analogia: '',
       codigo: [['package.json: todas las librerías', 'package.json', 1]],
       preguntas: [],
@@ -46,15 +46,16 @@ window.EXPO = {
             <span style="--x:16%;--y:70%;--r:2deg">No vine ayer 😅</span>
             <span style="--x:52%;--y:68%;--r:-3deg">¿En hoja o en el cuaderno?</span>
             <span style="--x:30%;--y:86%;--r:-2deg">El profe lo dijo en clase…</span>
+            <span style="--x:66%;--y:86%;--r:3deg">Se perdió en el WhatsApp 🙃</span>
           </div>
           <div class="solucion" data-p="2">
             <div class="tel grande"><img src="img/app/app-03-estudiante-tablero.png" alt=""></div>
             <div class="sol-texto">
-              <p class="t2">El docente publica <b>una vez</b>.</p>
+              <p class="t2">El monitor publica <b>una vez</b>.</p>
               <p class="t2">Todo el grupo <b>lo ve</b>.</p>
               <div class="chips">
                 <span class="chip"><i class="ph-bold ph-student"></i>Estudiantes</span>
-                <span class="chip"><i class="ph-bold ph-chalkboard-teacher"></i>Docentes</span>
+                <span class="chip"><i class="ph-bold ph-clipboard-text"></i>Monitores de tareas</span>
                 <span class="chip"><i class="ph-bold ph-shield-star"></i>Administradores</span>
               </div>
             </div>
@@ -63,10 +64,11 @@ window.EXPO = {
       guion: [
         'Pregunta al público, con pausa: "¿Cuántos se han enterado de una tarea el mismo día de entregarla?"',
         '[→] "Las tareas se dictan en clase y quedan regadas: cuaderno, WhatsApp, el que no vino no se entera."',
-        '[→] "ClassHub: el docente publica una vez y todo el grupo lo ve en el celular, y cada uno marca su avance."',
-        'Nombrar los 3 usuarios: estudiantes, docentes y administradores.',
+        '[→] "En cada salón ya existe el monitor de tareas. Con ClassHub, él (o quien el grupo elija) publica la tarea una vez y todo el grupo la ve en el celular; cada uno marca su avance."',
+        '"Es un proyecto de los estudiantes, para los estudiantes: los profesores no tienen que usar nada nuevo."',
+        'Nombrar los 3 usuarios: estudiantes, monitores de tareas y administradores.',
       ],
-      repaso: { que: 'El problema: no había una fuente única de tareas; nadie sabía qué estaba pendiente ni qué estaba hecho.', como: 'Usuarios: estudiantes (ven y marcan), docentes o moderadores (publican tareas, avisos y horario) y administradores (gestionan usuarios, grupos y materias). En producción: 49 cuentas reales y 90 grupos.' },
+      repaso: { que: 'El problema: no había una fuente única de tareas; nadie sabía qué estaba pendiente ni qué estaba hecho.', como: 'Usuarios: estudiantes (ven y marcan), monitores de tareas: en el código el rol se llama moderator (publican tareas, avisos y horario) y administradores (gestionan usuarios, grupos y materias). En producción: 49 cuentas reales y 90 grupos.' },
       analogia: 'Es pasar de "el que copió en el cuaderno" a una cartelera digital única que cada estudiante lleva en el bolsillo.',
       codigo: [['Tablero del estudiante', 'app/(app)/dashboard/page.tsx', 8]],
       preguntas: [],
@@ -286,30 +288,30 @@ window.EXPO = {
           <h1 class="t1 a">3 roles · 3 vistas</h1>
           <div class="roles-fila">
             <div class="rol" data-p="0" style="--c:#4C8DFF"><div class="tel"><img src="img/app/app-03-estudiante-tablero.png" alt=""></div><b>Estudiante</b><span>ve y marca</span></div>
-            <div class="rol" data-p="1" style="--c:#22C9A6"><div class="tel"><img src="img/app/app-07-docente-nueva-tarea.png" alt=""></div><b>Docente</b><span>publica</span></div>
+            <div class="rol" data-p="1" style="--c:#22C9A6"><div class="tel"><img src="img/app/app-07-docente-nueva-tarea.png" alt=""></div><b>Monitor</b><span>publica</span></div>
             <div class="rol ancho" data-p="2" style="--c:#B07CFF"><div class="pc"><img src="img/app/app-08-admin-panel.png" alt=""></div><b>Administrador</b><span>controla</span></div>
           </div>
         </div>`,
       guion: [
         '"Cada usuario ve solo lo que necesita."',
         '"El estudiante ve las tareas de su grupo, filtra por materia y marca pendiente, en proceso o completada. Gana puntos y sube de rango."',
-        '[→] "El docente publica tareas con materia, fecha, prioridad e imágenes; también avisos y el horario."',
+        '[→] "El monitor de tareas, o quien el grupo elija, publica las tareas con materia, fecha, prioridad e imágenes; también avisos y el horario."',
         '[→] "El administrador maneja usuarios, materias, grupos, el acceso y el sistema: 5 pestañas."',
       ],
       repaso: {
-        que: 'Roles: student (0), moderator o docente (1) y admin (2). El rol va dentro del JWT.',
+        que: 'Roles: student (0), moderator = monitor de tareas (1) y admin (2). El rol va dentro del JWT.',
         como: 'El middleware redirige según el rol (un estudiante en /admin vuelve a /dashboard). Las funciones responden a los requisitos: publicar por grupo, saber qué falta, comunicar (avisos, horario, push) y controlar (panel admin).',
       },
-      analogia: 'Como un colegio real: el estudiante ve su cuaderno, el profesor el tablero de su curso y coordinación las llaves de todo el edificio.',
+      analogia: 'Como el salón real: cada estudiante tiene su cuaderno, el monitor de tareas escribe en el tablero del salón y el administrador tiene las llaves de todo.',
       codigo: [
         ['Panel admin: 5 pestañas', 'app/(app)/admin/page.tsx', 352],
-        ['Pantalla del docente', 'app/(app)/moderator/page.tsx', 1],
+        ['Pantalla del monitor (moderator)', 'app/(app)/moderator/page.tsx', 1],
         ['Puntos (+3 / +10)', 'lib/points.ts', 21],
         ['Los 6 rangos', 'lib/ranks.ts', 25],
       ],
       preguntas: [
-        { p: '¿Un docente puede borrar tareas de otro grupo?', r: 'No. deleteTask compara el grupo de la tarea con el del docente; updateTask usa WHERE id = ? AND group_id = ?. Solo el admin puede todo. (lib/services/tasks.ts:136)' },
-        { p: '¿Para qué los puntos y rangos?', r: 'Para motivar: +10 al completar, +3 en proceso, +2 al entrar cada día; el docente gana +5 por tarea. Los puntos definen 6 rangos.' },
+        { p: '¿Un monitor puede borrar tareas de otro grupo?', r: 'No. deleteTask compara el grupo de la tarea con el del monitor; updateTask usa WHERE id = ? AND group_id = ?. Solo el admin puede todo. (lib/services/tasks.ts:136)' },
+        { p: '¿Para qué los puntos y rangos?', r: 'Para motivar: +10 al completar, +3 en proceso, +2 al entrar cada día; el monitor gana +5 por tarea publicada. Los puntos definen 6 rangos.' },
       ],
     },
     {
@@ -329,7 +331,7 @@ window.EXPO = {
         </div>`,
       guion: [
         '"ClassHub es una PWA: una página web que se instala en el celular con ícono y pantalla completa, sin tienda de apps. Eso lo define manifest.json."',
-        '[→] "Cuando el docente publica una tarea, al grupo le llega una notificación aunque la app esté cerrada. La recibe un service worker, sw.js, que queda despierto en segundo plano."',
+        '[→] "Cuando el monitor publica una tarea, al grupo le llega una notificación aunque la app esté cerrada. La recibe un service worker, sw.js, que queda despierto en segundo plano."',
         '[→] "Y se adapta a cualquier pantalla: celular, tablet o computador."',
         'OJO: no decir que "recuerda" las entregas solo; los recordatorios automáticos no están activos.',
       ],
@@ -402,7 +404,7 @@ window.EXPO = {
         <div class="s ia">
           <h1 class="t1 a">Del dictado al formulario</h1>
           <div class="ia-fila">
-            <div class="globo a" style="--d:.3s"><i class="ph-bold ph-chalkboard-teacher"></i><p class="escribe-txt">"Para el viernes, taller de ecuaciones, urgente, en hoja"</p></div>
+            <div class="globo a" style="--d:.3s"><i class="ph-bold ph-student"></i><p class="escribe-txt">"Para el viernes, taller de ecuaciones, urgente, en hoja"</p></div>
             <div class="ia-centro" data-p="1"><i class="logo grande-logo" style="--i:url(img/logos/claude.svg);--c:#D97757"></i><span>Claude</span></div>
             <div class="formu" data-p="2">
               <div><small>Título</small><b>Taller de ecuaciones</b></div>
@@ -411,18 +413,18 @@ window.EXPO = {
               <div><small>Entrega</small><b>Viernes</b></div>
             </div>
           </div>
-          <p class="t3 centro abajo" data-p="2">El docente revisa y publica</p>
+          <p class="t3 centro abajo" data-p="2">El monitor revisa y publica</p>
         </div>`,
       guion: [
-        '"Al docente no le gusta llenar formularios. Entonces escribe la tarea como la diría en clase."',
+        '"Llenar formularios es lento. Entonces el monitor escribe la tarea tal como el profe la dijo en clase."',
         '[→] "Ese texto va a nuestro servidor, que se lo manda a Claude, la IA de Anthropic, con instrucciones de devolver SOLO un JSON."',
-        '[→] "Ese JSON llena el formulario: título, prioridad, tipo, fecha. El docente revisa y publica. La IA ayuda, no decide."',
+        '[→] "Ese JSON llena el formulario: título, prioridad, tipo, fecha. El monitor revisa y publica. La IA ayuda, no decide."',
       ],
       repaso: {
         que: 'Se usa la API de Anthropic (modelo claude-haiku-4-5), que se paga por uso. La clave vive en una variable de entorno de Railway, nunca en el código.',
         como: 'AITaskAssistant.tsx envía el texto a POST /api/ai/assist. La ruta llama a Claude con un mensaje SYSTEM que exige un JSON con title, description, subject_name, priority, tag, delivery_method y due_date_hint; ese JSON llena CreateTaskModal.',
       },
-      analogia: 'Un secretario que escucha el dictado del profe y lo pasa en limpio a la planilla; el profe firma antes de publicar.',
+      analogia: 'Un secretario que pasa en limpio el dictado a la planilla; el monitor revisa antes de publicar.',
       codigo: [
         ['Ruta de la IA (POST)', 'app/api/ai/assist/route.ts', 70],
         ['Instrucciones SYSTEM', 'app/api/ai/assist/route.ts', 25],
@@ -430,7 +432,7 @@ window.EXPO = {
         ['Botón del asistente', 'components/AITaskAssistant.tsx', 59],
       ],
       preguntas: [
-        { p: '¿Y si la IA se equivoca?', r: 'Solo llena el formulario: el docente lo ve, corrige y decide si publica. Nada se publica solo.' },
+        { p: '¿Y si la IA se equivoca?', r: 'Solo llena el formulario: el monitor lo ve, corrige y decide si publica. Nada se publica solo.' },
         { p: '¿Cuánto cuesta y dónde está la clave?', r: 'Se paga por uso y es muy poco por tarea (modelo Haiku, el más económico). La clave está en las variables de entorno de Railway: process.env.ANTHROPIC_API_KEY, nunca en el código.' },
       ],
     },
@@ -450,7 +452,7 @@ window.EXPO = {
           <p class="t2 centro abajo" data-p="2">MySQL solo guarda <b>el link</b></p>
         </div>`,
       guion: [
-        '"Los docentes pueden adjuntar fotos a una tarea. Antes de aceptarlas, el servidor revisa: máximo 5 MB, máximo 3, y que de verdad sean imágenes."',
+        '"El monitor puede adjuntar fotos a una tarea (por ejemplo, la foto del tablero). Antes de aceptarlas, el servidor revisa: máximo 5 MB, máximo 3, y que de verdad sean imágenes."',
         '"Esto último lo hace mirando los primeros bytes reales del archivo (magic bytes): un archivo disfrazado de .jpg no pasa."',
         '[→] "La foto se sube a Cloudinary, un servicio en la nube especializado en imágenes."',
         '[→] "Cloudinary devuelve un link, y en MySQL solo guardamos ese link. La base queda liviana."',
@@ -560,7 +562,7 @@ window.EXPO = {
         </div>`,
       guion: [
         '"Tenemos 140 pruebas automáticas con Vitest: sesión, permisos, validaciones, límites. En cada cambio, GitHub Actions corre revisión de estilo, tipos, las pruebas, la compilación y una auditoría de seguridad."',
-        '[→] "Esto nos salvó: desde junio, los estudiantes y docentes no veían sus tareas. Una prueba reprodujo el error (el middleware respondía 403), lo arreglamos y la prueba pasó."',
+        '[→] "Esto nos salvó: desde junio, los estudiantes y monitores no veían sus tareas. Una prueba reprodujo el error (el middleware respondía 403), lo arreglamos y la prueba pasó."',
         '[→] "Además, cada noche se saca un respaldo de la base con mysqldump, y si falla el internet tenemos el modo offline."',
       ],
       repaso: {
@@ -626,9 +628,9 @@ window.EXPO = {
   // Las preguntas oficiales de la profe, con respuesta puntual.
   sena: [
     { id: 1, p: '¿Qué problema o necesidad busca resolver el sistema y quiénes son sus usuarios?', quien: 0, dia: [2, 8],
-      r: 'Las tareas se dictaban en clase y quedaban dispersas (cuaderno, WhatsApp); no había una fuente única ni se sabía qué estaba hecho. Usuarios: estudiantes (ven y marcan su avance), docentes (publican tareas, avisos y horario) y administradores (gestionan usuarios, grupos y materias). Hoy: 49 cuentas reales y 90 grupos.' },
+      r: 'Las tareas se dictaban en clase y quedaban dispersas (cuaderno, WhatsApp); no había una fuente única ni se sabía qué estaba hecho. Usuarios: estudiantes (ven y marcan su avance), monitores de tareas elegidos en cada salón, rol moderator (publican tareas, avisos y horario) y administradores (gestionan usuarios, grupos y materias). Es un proyecto de los estudiantes: los profesores no son usuarios. Hoy: 49 cuentas reales y 90 grupos.' },
     { id: 2, p: '¿Cuáles son las principales funcionalidades y cómo responden a los requisitos?', quien: 1, dia: [8, 9, 11, 12],
-      r: 'Publicar tareas por grupo → el docente crea tareas con materia, fecha, prioridad e imágenes. Saber qué falta → tablero con filtros, calendario y estados (pendiente, en proceso, completada). Comunicar → avisos, horario y notificaciones push. Controlar → panel admin con 5 pestañas. Acceso seguro → login con correo institucional y roles. Extras: IA para crear tareas y puntos con rangos para motivar.', codigo: [['Tablero', 'app/(app)/dashboard/page.tsx', 8], ['Crear tarea', 'lib/services/tasks.ts', 85]] },
+      r: 'Publicar tareas por grupo → el monitor de tareas crea tareas con materia, fecha, prioridad e imágenes. Saber qué falta → tablero con filtros, calendario y estados (pendiente, en proceso, completada). Comunicar → avisos, horario y notificaciones push. Controlar → panel admin con 5 pestañas. Acceso seguro → login con correo institucional y roles. Extras: IA para crear tareas y puntos con rangos para motivar.', codigo: [['Tablero', 'app/(app)/dashboard/page.tsx', 8], ['Crear tarea', 'lib/services/tasks.ts', 85]] },
     { id: 3, p: '¿Qué tecnologías, lenguajes y herramientas usaron y por qué?', quien: 0, dia: [4, 7, 10, 13, 14],
       r: 'TypeScript en todo (un solo lenguaje; los tipos atrapan errores antes). Next.js + React (frontend y backend en un solo proyecto). MySQL (datos muy relacionados). Tailwind (diseño adaptable rápido). Zod (validar), jose (JWT), Cloudinary (imágenes), Claude (IA), Vitest (pruebas), GitHub Actions (CI y respaldo), Docker + Railway (publicar con app y base juntas, 0–5 USD al mes).', codigo: [['package.json', 'package.json', 1]] },
     { id: 4, p: '¿Cómo está organizada la arquitectura del sistema?', quien: 0, dia: [4, 5],
@@ -638,7 +640,7 @@ window.EXPO = {
     { id: 6, p: '¿Qué medidas implementaron para validar los datos y proteger la información?', quien: 0, dia: [6, 12],
       r: 'Zod valida toda entrada (si no cumple, 400). Consultas con parámetros "?" (sin inyección SQL). JWT firmado de 1 hora en cookie HttpOnly, renovación de 30 días con rotación. Dos capas de permisos (middleware y requireRole). 10 intentos fallidos → bloqueo de 15 min. Imágenes: tamaño, tipo y magic bytes. Encabezados de seguridad (CSP, HSTS, X-Frame-Options) y HTTPS. Registro solo con correo institucional.', codigo: [['Zod', 'lib/schemas.ts', 69], ['Encabezados de seguridad', 'next.config.ts', 13], ['Límite de intentos', 'lib/rate-limit.ts', 12]] },
     { id: 7, p: '¿Cómo tuvieron en cuenta la facilidad de uso, el diseño móvil y la accesibilidad?', quien: 1, dia: [7, 9],
-      r: 'Mobile-first con Tailwind (se adapta con sm:, md:, lg:), PWA instalable, cada rol ve solo lo suyo, el estado se marca en un toque, colores por materia y la IA le ahorra escritura al docente. Accesibilidad: idioma declarado (lang="es") y etiquetas aria en botones y ventanas. Honestos: no hicimos una auditoría formal WCAG; es una mejora.', codigo: [['lang="es"', 'app/layout.tsx', 34]] },
+      r: 'Mobile-first con Tailwind (se adapta con sm:, md:, lg:), PWA instalable, cada rol ve solo lo suyo, el estado se marca en un toque, colores por materia y la IA le ahorra escritura al monitor. Accesibilidad: idioma declarado (lang="es") y etiquetas aria en botones y ventanas. Honestos: no hicimos una auditoría formal WCAG; es una mejora.', codigo: [['lang="es"', 'app/layout.tsx', 34]] },
     { id: 8, p: '¿Qué pruebas realizaron y cómo solucionaron los errores?', quien: 3, dia: [15],
       r: '140 pruebas automáticas con Vitest (sesión, permisos, validaciones, límites, middleware), con la base simulada. La CI de GitHub Actions corre en cada cambio lint, tipos (tsc), pruebas, compilación y npm audit. Pruebas manuales de los 3 roles contra una copia de la base. Método: reproducir el error con una prueba, arreglarlo y verificar que pase (así se arregló el bug de junio, commit d7f9562).', codigo: [['Pruebas del middleware', '__tests__/middleware.test.ts', 1], ['La CI', '.github/workflows/ci.yml', 41]] },
     { id: 9, p: '¿Cuál fue la principal dificultad técnica y cómo la resolvieron?', quien: 0, dia: [14, 15],
