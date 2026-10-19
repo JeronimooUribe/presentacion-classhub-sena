@@ -3,7 +3,8 @@
 # 2) Abre solo lo de la expo: servidor, Antigravity IDE con ClassHub, presentador y proyector en Chrome.
 # 3) Si hay proyector conectado, manda la ventana del publico alla en pantalla completa.
 # Con -SoloProyectar solo hace el paso 3 (para cuando se conecta el HDMI despues).
-param([switch]$SoloProyectar)
+# Con -Dividido: en la pantalla del proyector pone la diapositiva a la izquierda y ClassHub funcionando a la derecha.
+param([switch]$SoloProyectar, [switch]$Dividido)
 
 $ErrorActionPreference = 'SilentlyContinue'
 $aqui = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -30,6 +31,13 @@ public class Win {
       var t = s.ToString(); if (t.Contains(a) && t.Contains(b)) { r = h; return false; } return true; }, IntPtr.Zero);
     return r;
   }
+  // La ventana de la app ClassHub (no la presentacion): dice ClassHub y Chrome, pero no Presentador ni Proyeccion.
+  public static IntPtr BuscarApp() {
+    IntPtr r = IntPtr.Zero;
+    EnumWindows((h, p) => { if (!IsWindowVisible(h)) return true; var s = new StringBuilder(300); GetWindowText(h, s, 300);
+      var t = s.ToString(); if (t.Contains("ClassHub") && t.Contains("Google Chrome") && !t.Contains("Presentador") && !t.Contains("Proyecci")) { r = h; return false; } return true; }, IntPtr.Zero);
+    return r;
+  }
 }
 "@
 
@@ -54,6 +62,36 @@ function Proyectar {
   Start-Sleep -Milliseconds 600
   if ($pres -ne [IntPtr]::Zero) { [Win]::ShowWindow($pres, 3) | Out-Null; [Win]::SetForegroundWindow($pres) | Out-Null }
   return $true
+}
+
+function Dividir {
+  $pantallas = [System.Windows.Forms.Screen]::AllScreens
+  $destino = $pantallas | Where-Object { -not $_.Primary } | Select-Object -First 1
+  if (-not $destino) { $destino = [System.Windows.Forms.Screen]::PrimaryScreen }
+  $a = $destino.WorkingArea
+  $mitad = [int]($a.Width / 2)
+  $pub = Esperar-Ventana 'ClassHub' 'Proyecci' 15
+  $app = [Win]::BuscarApp()
+  if ($app -eq [IntPtr]::Zero) {
+    Start-Process -FilePath $chrome -ArgumentList '--new-window', 'https://classhub-production.up.railway.app/login'
+    for ($i = 0; $i -lt 30 -and $app -eq [IntPtr]::Zero; $i++) { Start-Sleep -Milliseconds 500; $app = [Win]::BuscarApp() }
+  }
+  if ($pub -ne [IntPtr]::Zero) {
+    [Win]::ShowWindow($pub, 9) | Out-Null
+    [Win]::SetWindowPos($pub, [IntPtr]::Zero, $a.X, $a.Y, $mitad, $a.Height, 0x0040) | Out-Null
+  }
+  if ($app -ne [IntPtr]::Zero) {
+    [Win]::ShowWindow($app, 9) | Out-Null
+    [Win]::SetWindowPos($app, [IntPtr]::Zero, $a.X + $mitad, $a.Y, $a.Width - $mitad, $a.Height, 0x0040) | Out-Null
+    [Win]::SetForegroundWindow($app) | Out-Null
+  }
+  if ($pub -ne [IntPtr]::Zero) { [Win]::SetForegroundWindow($pub) | Out-Null }
+}
+
+if ($Dividido) {
+  if ([System.Windows.Forms.Screen]::AllScreens.Count -lt 2) { & DisplaySwitch.exe /extend; Start-Sleep -Seconds 3 }
+  Dividir
+  exit
 }
 
 if ($SoloProyectar) {
