@@ -60,6 +60,13 @@
         return `<li>${clic ? '<span class="clic">clic</span>' : ''}${x}</li>`;
       };
 
+      // Agrupa diapositivas seguidas: [0,1,2,3,4,5,15,16] → [[0..5],[15,16]]
+      const tramos = mias => mias.reduce((acc, { n }) => {
+        const ult = acc[acc.length - 1];
+        if (ult && ult[ult.length - 1] === n - 1) ult.push(n); else acc.push([n]);
+        return acc;
+      }, []);
+
       function pintar() {
         const i = Math.max(0, Math.min(3, Number(location.hash.slice(1)) || 0));
         const p = E.equipo[i];
@@ -69,15 +76,19 @@
 
         const mias = E.slides.map((s, n) => ({ s, n })).filter(o => o.s.quien === i);
         const total = mias.reduce((a, o) => a + o.s.seg, 0);
-        const antes = E.slides[mias[0].n - 1], despues = E.slides[mias[mias.length - 1].n + 1];
         const sena = E.sena.filter(q => q.quien === i);
 
         document.getElementById('cuerpo').innerHTML = `
           <section class="resumen" style="--p:${p.color}">
             <h2>${esc(p.n)}</h2>
             <p><b>Tu tema:</b> ${esc(p.tema)} · <b>${mias.length} diapositivas</b> · unos <b>${mmss(total)}</b> minutos.</p>
-            <p>${antes ? `Antes de ti habla <b>${esc(E.equipo[antes.quien].corto)}</b>: al terminar la diapositiva ${mias[0].n} te pasa la palabra y tú arrancas en la <b>${mias[0].n + 1}</b>.` : 'Tú abres la exposición.'}
-               ${despues && E.slides[mias[mias.length - 1].n + 1].quien !== i ? ` Al terminar, le pasas la palabra a <b>${esc(E.equipo[despues.quien].corto)}</b>.` : ''}</p>
+            ${tramos(mias).map(t => {
+              const de = E.slides[t[0] - 1], a = E.slides[t[t.length - 1] + 1];
+              const rango = t.length > 1 ? `Diapositivas <b>${t[0] + 1}–${t[t.length - 1] + 1}</b>` : `Diapositiva <b>${t[0] + 1}</b>`;
+              const inicio = de ? `<b>${esc(E.equipo[de.quien].corto)}</b> te pasa la palabra` : 'abres la exposición';
+              const fin = a ? `le pasas la palabra a <b>${esc(E.equipo[a.quien].corto)}</b>` : 'cierras y abres las preguntas';
+              return `<p>${rango}: ${inicio}; al terminar, ${fin}.</p>`;
+            }).join('')}
             <div class="orden">${E.slides.map((s, n) => `<span style="--p:${E.equipo[s.quien].color}" class="${s.quien === i ? 'mia' : ''}">${n + 1}</span>`).join('')}</div>
           </section>
           <p class="tip">Si te bloqueas: lee "La idea" de tu diapositiva y dila con tus palabras. No hace falta decirlo igual; Jerónimo te apoya.${i === 0 ? ' Tú apoyas a los demás reforzando conceptos.' : ''}</p>

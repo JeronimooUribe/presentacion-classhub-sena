@@ -19,7 +19,7 @@
 html, body { margin: 0; height: 100%; background: var(--fondo); overflow: hidden; }
 body { font-family: 'Jakarta', 'Segoe UI', system-ui, sans-serif; color: var(--texto); cursor: default; -webkit-font-smoothing: antialiased; }
 
-#escenario { position: absolute; left: 50%; top: 50%; width: 1920px; height: 1080px; transform-origin: center; overflow: hidden;
+#escenario { position: fixed; left: 50%; top: 50%; width: 1920px; height: 1080px; transform-origin: center; overflow: hidden;
   background: radial-gradient(1200px 700px at 15% 0%, #12245A 0%, transparent 60%), var(--fondo); }
 #lienzo { position: absolute; inset: 0; --c: var(--azul); }
 #lienzo::before { content: ''; position: absolute; inset: -15%; pointer-events: none;
