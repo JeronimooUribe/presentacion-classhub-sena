@@ -15,4 +15,4 @@ if exist "%AG%" start "" "%AG%" "%REPO%"
 rem 3. La vista del presentador
 timeout /t 3 /nobreak >nul
 set "CHROME=%ProgramFiles%\Google\Chrome\Application\chrome.exe"
-if exist "%CHROME%" (start "" "%CHROME%" --new-window "http://127.0.0.1:5190/") else (start "" "http://127.0.0.1:5190/")
+if exist "%CHROME%" (start "" "%CHROME%" --new-window "http://127.0.0.1:5190/#inicio") else (start "" "http://127.0.0.1:5190/#inicio")

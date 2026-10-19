@@ -76,6 +76,8 @@
     if (!corriendo && estado.s > 0 && acumulado === 0) { desde = Date.now(); corriendo = true; relojBoton(); }
     notas(estado);
   });
+  // ?inicio o #inicio: la exposición arranca en la portada.
+  if (/inicio/.test(location.hash + location.search)) M.ir(0, 0);
   notas(M.estado);
   ultima = M.estado.s;
 
